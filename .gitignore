@@ -1,6 +1,13 @@
-# Block
+# Ignore everything by default
 *
-# Unblock
-!.gitignore
+
+# Allow only .ixx and .cpp files
 !*.ixx
 !*.cpp
+
+# Allow directories to ensure the .ixx and .cpp files in subdirectories are tracked
+!*/
+
+# Exclude all hidden files and folders (optional, removes dotfiles like .DS_Store, .vscode, etc.)
+.*
+

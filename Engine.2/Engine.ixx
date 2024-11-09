@@ -131,7 +131,7 @@ export class Engine {
 	}
 
 	void createGraph(std::pair<unsigned int, unsigned int> _windowSize, unsigned int _pn) {
-		sf::Int32 startT = globalClock.getElapsedTime().asSeconds();
+		sf::Int32 startT = globalClock.getElapsedTime().asMicroseconds();
 
 		unsigned int _cpn = ((float)_pn / (float)_windowSize.second * (float)_windowSize.first);
 		for (int line = 0; line <= _pn; line++) {
@@ -143,7 +143,7 @@ export class Engine {
 				);
 		}
 
-		std::cout << "- GC took " << globalClock.getElapsedTime().asSeconds() - startT << " seconds -\n";
+		std::cout << "- GC took " << globalClock.getElapsedTime().asMicroseconds() - startT << " seconds -\n";
 	}
 
 public:
@@ -230,7 +230,7 @@ public:
 						viewLock = false;
 					}
 
-					//std::cout << _graph.size() << std::endl;
+					std::cout << _graph.size() << std::endl;
 					checkAndExecuteEventsInAllObjects();
 					moveAllObjects();
 					updateAllObjects();
