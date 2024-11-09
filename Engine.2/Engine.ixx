@@ -7,44 +7,6 @@ import GraphContainer;
 
 export class Engine {
 
-	static void checkAndExecuteCollisionsInAllObjects() {
-		for (std::pair<uint64_t, std::weak_ptr<Collidable>> e : oc._objectWithCollisions) {
-			for (std::pair<uint64_t, std::weak_ptr<Collidable>> otherObject : oc._objectWithCollisions) {
-				if (e.first != otherObject.first) {
-					if (e.second.lock()->isInCollisionWith(otherObject.second)) {
-						if (e.second.lock()->putObjectColliding(otherObject.second.lock())) {
-
-							e.second.lock()->afterCollision();
-
-						}
-					}
-					else if (e.second.lock()->checkCollisionList(otherObject.second.lock()))
-						e.second.lock()->eraseObjectColliding(otherObject.second.lock());
-				}
-			}
-		}
-	}
-
-	static void watchCollisionThread() {
-		if (window) {
-
-			sf::Int32 prevTime = globalClock.getElapsedTime().asMilliseconds();
-
-			while (isWindowOpen) {
-				sf::Int32 elapsedTime = globalClock.getElapsedTime().asMilliseconds();
-				if (elapsedTime - prevTime > (1000 / (__framerate))) {
-
-					prevTime = elapsedTime;
-
-					deleteMutex.lock();
-					checkAndExecuteCollisionsInAllObjects();
-					deleteMutex.unlock();
-
-
-				}
-			}
-		}
-	}
 	void checkAndExecuteEventsInAllObjects() {
 		while (window->pollEvent(*event)) {
 			if (event->type == sf::Event::Closed) {
@@ -130,22 +92,6 @@ export class Engine {
 		}
 	}
 
-	void createGraph(std::pair<unsigned int, unsigned int> _windowSize, unsigned int _pn) {
-		sf::Int32 startT = globalClock.getElapsedTime().asMicroseconds();
-
-		unsigned int _cpn = ((float)_pn / (float)_windowSize.second * (float)_windowSize.first);
-		for (int line = 0; line <= _pn; line++) {
-			for (int column = 0; column <= _cpn; column++) 
-				_graph.addPoint(
-					std::make_shared<GraphPoint>(
-					sf::Vector2f(_windowSize.first / _cpn * column, _windowSize.second / _pn * line),
-					sf::Vector2u(column, line))
-				);
-		}
-
-		std::cout << "- GC took " << globalClock.getElapsedTime().asMicroseconds() - startT << " seconds -\n";
-	}
-
 public:
 	Engine() {
 		std::cout << "<- Engine Loading... ->\n";
@@ -196,9 +142,6 @@ public:
 
 		isWindowOpen = true;
 
-		sf::Thread collisionThread(&watchCollisionThread);
-		collisionThread.launch();
-
 		sf::Int32 prevTime = globalClock.getElapsedTime().asMilliseconds();
 
 		if (window) {
@@ -209,7 +152,7 @@ public:
 				if (elapsedTime - prevTime > 1000 / (__framerate)) {
 					prevTime = elapsedTime;
 
-					try {
+					/*try {
 						if (viewLock) {
 							std::weak_ptr<Base> _viewObject = oc._database[viewObjectData.first][viewObjectData.second];
 							if (_viewObject.lock() == nullptr) throw std::exception("ViewObject terminated.");
@@ -228,9 +171,8 @@ public:
 					}
 					catch (const std::exception& err) {
 						viewLock = false;
-					}
-
-					std::cout << _graph.size() << std::endl;
+					}*/
+					
 					checkAndExecuteEventsInAllObjects();
 					moveAllObjects();
 					updateAllObjects();
@@ -249,8 +191,6 @@ public:
 			std::cout << "!- Init the window -!\n";
 
 		}
-
-		collisionThread.wait();
 
 	}
 

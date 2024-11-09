@@ -3,12 +3,6 @@ export module GraphContainer;
 import Globals;
 export import GraphPoint;
 
-struct v2u_hash {
-	std::size_t operator()(const sf::Vector2u& p) const {
-		return std::hash<int>{}(p.x) ^ (std::hash<int>{}(p.y) << 1);
-	}
-};
-
 bool operator == (sf::Vector2u a, sf::Vector2u b)
 {
 	if (a.x == b.x and a.y == b.y) return true;
@@ -29,24 +23,15 @@ export class GraphContainer {
 public:
 
 	bool addPoint(std::shared_ptr<GraphPoint> newPoint) {
-		for (const auto& e : __container)
-			if (e.second->getNumber() == newPoint->getNumber()) return false; // Already exists.
+		if (__container.count(newPoint->getNumber())) // always 1 or 0
+			return false; // Already exists.
 		__container[newPoint->getNumber()] = newPoint; 
 	}
 
-	bool getPoint(sf::Vector2u number, std::shared_ptr<GraphPoint>& point) {
-		/*for (auto& e : __container)
-			if (e.second->getNumber() == number) {
-				if (e.second->isBlocked()) return false;
-				point = e.second; return true;
-			}*/
-
-		if (__container.count(number)) {
-			point = __container[number]; return true;
-			//__container.at(number);
+	void getPoint(sf::Vector2u number, std::weak_ptr<GraphPoint>& point) {
+		if (__container.count(number)) { // always 1 or 0
+			point = __container[number]; return;
 		}
-			
-
 		this->_createPoint(number); // if the point doesn't exist yet
 
 		return getPoint(number, point);
@@ -56,5 +41,4 @@ public:
 		return __container.size();
 	}
 
-	friend class ObjectContainer;
 } inline _graph;

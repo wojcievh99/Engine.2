@@ -3,14 +3,14 @@ export module GraphPoint;
 import Globals;
 
 export class GraphPoint {
-	bool __b;
 	sf::Vector2u __nr; sf::Vector2f __position;
+	unsigned int __objects;
 public:
 	GraphPoint(sf::Vector2f position, sf::Vector2u nr)
-		: __position(position), __nr(nr), __b(false) { }
+		: __position(position), __nr(nr), __objects(0) { }
 
-	bool isBlocked() {
-		return __b;
+	unsigned int isBlocked() {
+		return __objects;
 	}
 
 	sf::Vector2f getPosition() {
@@ -20,10 +20,10 @@ public:
 		return __nr;
 	}
 
-	void block() {
-		__b = true;
+	void intersected() {
+		__objects++;
 	}
-	void unblock() {
-		__b = false;
+	void diverged() {
+		__objects--;
 	}
 };

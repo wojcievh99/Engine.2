@@ -25,3 +25,9 @@ export uint64_t globalID = 0;
 
 export const std::string red("\033[31m");
 export const std::string reset("\033[0m");
+
+export struct v2u_hash {
+	std::size_t operator()(const sf::Vector2u& p) const {
+		return std::hash<int>{}(p.x) ^ (std::hash<int>{}(p.y) << 1);
+	}
+};

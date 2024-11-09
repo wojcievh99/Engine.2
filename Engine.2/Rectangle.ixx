@@ -5,30 +5,18 @@ import Drawable;
 import Moveable;
 import Eventable;
 import Updateable;
+import Collidable;
 
-export class Rectangle : public virtual Base, public Drawable, public Moveable, public Eventable, public Updateable {
+export class Rectangle : public virtual Base, public Drawable, public Moveable, public Eventable, public Updateable, public Collidable {
 	sf::RectangleShape _body;
 	std::vector<std::weak_ptr<GraphPoint>> _size;
 
 public:
 	Rectangle(sf::Vector2u position, sf::Vector2u size, sf::Color color)
-		: Base(typeid(this).raw_name(), position)
+		: Base(typeid(this).raw_name(), position), Collidable(size)
 	{
-		for (unsigned int column = 0; column < size.y; column++) {
-			for (unsigned int line = 0; line < size.x; line++) {
-				_size.push_back(
-					std::make_shared<GraphPoint>(
-						sf::Vector2f(
-							float(position.x + line) * __graphPointDistance,
-							float(position.y + column) * __graphPointDistance
-						),
-						sf::Vector2u(position.x + line, position.y + column)
-					)
-				);
-			}
-		}
 
-		_body.setPosition(_position->getPosition());
+		_body.setPosition(_position.lock()->getPosition());
 		_body.setSize(sf::Vector2f(size.x * __graphPointDistance, size.y * __graphPointDistance));
 		_body.setFillColor(color);
 
@@ -57,7 +45,7 @@ public:
 	}
 
 	void drawObject() {
-		_body.setPosition(_position->getPosition());
+		_body.setPosition(_position.lock()->getPosition());
 		window->draw(_body);
 	}
 

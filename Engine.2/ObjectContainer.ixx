@@ -36,7 +36,7 @@ export class ObjectContainer {
 			_objectUpdates[r->getID()] = Functor([x]() { x->updateObject(); });
 		}
 		if (std::shared_ptr<Collidable> x = std::dynamic_pointer_cast<Collidable>(r)) {
-			_objectWithCollisions[r->getID()] = x;
+			//_objectWithCollisions[r->getID()] = x;
 		}
 		if (std::shared_ptr<Eventable> x = std::dynamic_pointer_cast<Eventable>(r)) {
 			_objectsWithEventsAssociatedWithFunctions[r->getID()] = x;

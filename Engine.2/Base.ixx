@@ -7,7 +7,7 @@ export class Base {
 	std::string __object_className;
 	std::uint64_t __object_id;
 protected:
-	std::shared_ptr<GraphPoint> _position;
+	std::weak_ptr<GraphPoint> _position;
 	bool _object_alive;
 public:
 	Base(std::string _className = "!", sf::Vector2u _pos = sf::Vector2u(0, 0))
@@ -22,7 +22,7 @@ public:
 		std::cout << "[ID: " << __object_id << ", className: " << __object_className << "](-) \n";
 	}
 
-	std::shared_ptr<GraphPoint> getPosition() {
+	std::weak_ptr<GraphPoint> getPosition() {
 		return _position;
 	}
 	std::uint64_t getID() {

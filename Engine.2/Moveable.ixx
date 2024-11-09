@@ -18,7 +18,7 @@ public:
 	void setAccDirectionY(unsigned int Y) { __acceleration.x = Y; }
 
 	virtual void moveObject() {
-		_graph.getPoint(_position->getNumber() + this->getMoveDir(), _position);
+		_graph.getPoint(_position.lock()->getNumber() + this->getMoveDir(), _position);
 	};
 	void accelerateObject() {
 		__moveDirection += __acceleration;
