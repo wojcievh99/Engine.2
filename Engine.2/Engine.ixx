@@ -6,12 +6,14 @@ import ObjectContainer;
 import GraphContainer;
 
 export class Engine {
+	std::unique_ptr<sf::Event> _event;
+	std::mutex _deleteMutex;
 
 	void checkAndExecuteEventsInAllObjects() {
-		while (window->pollEvent(*event)) {
-			if (event->type == sf::Event::Closed) {
+		while (window->pollEvent(*_event)) {
+			if (_event->type == sf::Event::Closed) {
 
-				isWindowOpen = false;
+				window->close();
 				break;
 
 			}
@@ -20,13 +22,13 @@ export class Engine {
 
 					for (auto const& [key, func] : e.second.lock()->_keyAssociation)
 						if (!e.second.lock()->_lockedIndKeys.contains(key)
-							and event->type == sf::Event::KeyPressed and event->key.code == key)
+							and _event->type == sf::Event::KeyPressed and _event->key.code == key)
 						{
 							Functor f = func; f();
 						}
 					for (auto const& [key, func] : e.second.lock()->_rKeyAssociation)
 						if (!e.second.lock()->_lockedIndKeys.contains(key)
-							and event->type == sf::Event::KeyReleased and event->key.code == key)
+							and _event->type == sf::Event::KeyReleased and _event->key.code == key)
 						{
 							if (!e.second.lock()->_lockedIndKeyRelease.contains(key)) {
 								Functor f = func; f();
@@ -35,13 +37,13 @@ export class Engine {
 						}
 					for (auto const& [button, func] : e.second.lock()->_buttonAssociation)
 						if (!e.second.lock()->_lockedIndButtons.contains(button)
-							and event->type == sf::Event::MouseButtonPressed and event->mouseButton.button == button)
+							and _event->type == sf::Event::MouseButtonPressed and _event->mouseButton.button == button)
 						{
 							Functor f = func; f();
 						}
 					for (auto const& [button, func] : e.second.lock()->_rButtonAssociation)
 						if (!e.second.lock()->_lockedIndButtons.contains(button)
-							and event->type == sf::Event::MouseButtonReleased and event->mouseButton.button == button)
+							and _event->type == sf::Event::MouseButtonReleased and _event->mouseButton.button == button)
 						{
 							if (!e.second.lock()->_lockedIndButtonRelease.contains(button)) {
 								Functor f = func; f();
@@ -85,9 +87,9 @@ export class Engine {
 					if (object == nullptr) throw std::exception("Object Terminated.");
 					if (!object->isObjectAlive()) {
 
-						deleteMutex.lock();
+						_deleteMutex.lock();
 						oc.deleteObject(object->getID());
-						deleteMutex.unlock();
+						_deleteMutex.unlock();
 
 						break;
 					}
@@ -129,37 +131,46 @@ public:
 		window->setKeyRepeatEnabled(false);
 		window->setPosition({ 0,0 });
 
-		event = std::make_unique<sf::Event>();
-
-		isWindowOpen = true;
+		_event = std::make_unique<sf::Event>();
 
 		std::cout << "<- Engine Loaded ->\n";
-		return isWindowOpen;
-	}
-
-	bool lockViewOnObject(std::pair<std::string, uint64_t> _objectData) {
-		if (oc._database[_objectData.first][_objectData.second] != nullptr) {
-			viewObjectData = _objectData;
-			return viewLock = true;
-		}
-		return false;
+		return true;
 	}
 
 	void run() {
-
-		isWindowOpen = true;
-
 		sf::Int32 prevTime = globalClock.getElapsedTime().asMilliseconds();
 
 		if (window) {
-			window->setActive(false);
-
-			while (isWindowOpen) {
+			while (window->isOpen()) {
 				sf::Int32 elapsedTime = globalClock.getElapsedTime().asMilliseconds();
 				if (elapsedTime - prevTime > 1000 / (__framerate)) {
 					prevTime = elapsedTime;
+					
+					_deleteMutex.lock();
 
-					/*try {
+					checkAndExecuteEventsInAllObjects();
+					moveAllObjects();
+					updateAllObjects();
+					deleteAllObjects();
+
+					window->clear();
+					drawAllObjects();
+					window->display();
+
+					_deleteMutex.unlock();
+
+				}
+			}
+		}
+		else {
+			std::cout << "!- Init the window -!\n";
+		}
+
+	}
+
+} inline engine;
+
+/*try {
 						if (viewLock) {
 							std::weak_ptr<Base> _viewObject = oc._database[viewObjectData.first][viewObjectData.second];
 							if (_viewObject.lock() == nullptr) throw std::exception("ViewObject terminated.");
@@ -179,26 +190,3 @@ public:
 					catch (const std::exception& err) {
 						viewLock = false;
 					}*/
-					
-					checkAndExecuteEventsInAllObjects();
-					moveAllObjects();
-					updateAllObjects();
-					deleteAllObjects();
-
-					window->clear();
-					drawAllObjects();
-					window->display();
-				}
-			}
-			window->close();
-
-		}
-		else {
-
-			std::cout << "!- Init the window -!\n";
-
-		}
-
-	}
-
-} inline engine;

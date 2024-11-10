@@ -5,6 +5,7 @@ import std;
 import Engine;
 
 import Rectangle;
+import Character;
 
 /*
 # Ignoruj wszystkie pliki
@@ -28,8 +29,8 @@ int main()
 {
     bool condition = engine.init(std::make_pair(1000, 1200), "TEST", false, 60, 3.f);
 
-    auto r = engine.addObject<Rectangle>(std::make_shared<Rectangle>(
-        sf::Vector2u(200, 200),
+    auto r = engine.addObject<Character>(std::make_shared<Character>(
+        sf::Vector2u(100, 100),
         sf::Vector2u(30, 30),
         sf::Color::Green
     ));
@@ -39,9 +40,14 @@ int main()
         sf::Vector2u(10, 50),
         sf::Color::Red
     ));
-    
-    //engine.lockViewOnObject(std::make_pair(r.lock()->getClassName(), r.lock()->getID()));
-    
+
+    engine.addObject<Rectangle>(std::make_shared<Rectangle>(
+        sf::Vector2u(200, 80),
+        sf::Vector2u(50, 200),
+        sf::Color::Red
+    ));
+        
     if (condition) engine.run();
 
+    return 0;
 }
