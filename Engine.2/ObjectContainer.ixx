@@ -14,8 +14,8 @@ export class ObjectContainer {
 	std::map<std::string, std::unordered_map<uint64_t, std::shared_ptr<Base>>> _database;
 
 	std::unordered_map<uint64_t, Functor> _objectDraws;
-	std::unordered_map<uint64_t, std::pair<Functor, Functor>> _objectMoves; // accelerate, move
 	std::unordered_map<uint64_t, Functor> _objectUpdates;
+	std::unordered_map<uint64_t, std::weak_ptr<Moveable>> _objectMoves;
 	std::unordered_map<uint64_t, std::weak_ptr<Collidable>> _objectWithCollisions;
 	std::unordered_map<uint64_t, std::weak_ptr<Eventable>> _objectsWithEventsAssociatedWithFunctions;
 
@@ -29,14 +29,14 @@ export class ObjectContainer {
 		if (std::shared_ptr<Drawable> x = std::dynamic_pointer_cast<Drawable>(r)) {
 			_objectDraws[r->getID()] = Functor([x]() { x->drawObject(); });
 		}
-		if (std::shared_ptr<Moveable> x = std::dynamic_pointer_cast<Moveable>(r)) {
-			_objectMoves[r->getID()] = std::make_pair(Functor([x]() { x->accelerateObject(); }), Functor([x]() { x->moveObject(); }));
-		}
 		if (std::shared_ptr<Updateable> x = std::dynamic_pointer_cast<Updateable>(r)) {
 			_objectUpdates[r->getID()] = Functor([x]() { x->updateObject(); });
 		}
+		if (std::shared_ptr<Moveable> x = std::dynamic_pointer_cast<Moveable>(r)) {
+			_objectMoves[r->getID()] = x;
+		}
 		if (std::shared_ptr<Collidable> x = std::dynamic_pointer_cast<Collidable>(r)) {
-			//_objectWithCollisions[r->getID()] = x;
+			_objectWithCollisions[r->getID()] = x;
 		}
 		if (std::shared_ptr<Eventable> x = std::dynamic_pointer_cast<Eventable>(r)) {
 			_objectsWithEventsAssociatedWithFunctions[r->getID()] = x;

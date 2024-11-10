@@ -37,6 +37,14 @@ public:
 		return getPoint(number, point);
 	}
 
+	std::weak_ptr<GraphPoint> getPoint(sf::Vector2u number) {
+		if (__container.count(number))
+			return __container[number];
+		else 
+			this->_createPoint(number);
+		return  getPoint(number);
+	}
+
 	size_t size() {
 		return __container.size();
 	}

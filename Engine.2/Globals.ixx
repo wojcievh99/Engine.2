@@ -31,3 +31,20 @@ export struct v2u_hash {
 		return std::hash<int>{}(p.x) ^ (std::hash<int>{}(p.y) << 1);
 	}
 };
+
+// Mathematical sets differences defined below. Always: A \ B.
+export 
+std::vector<sf::Vector2u> containerDifference(std::unordered_set<sf::Vector2u, v2u_hash> A, std::vector<sf::Vector2u> B) {
+	for (auto e : B) {
+		if (A.contains(e)) A.erase(e);
+	}	
+	std::vector<sf::Vector2u> v(A.begin(), A.end());
+	return v;
+}
+export
+std::vector<sf::Vector2u> containerDifference(std::vector<sf::Vector2u> A, std::unordered_set<sf::Vector2u, v2u_hash> B) {
+	for (size_t i = 0; i < A.size(); i++) {
+		if (B.contains(A[i])) A.erase(A.begin() + i--);
+	}
+	return A;
+}

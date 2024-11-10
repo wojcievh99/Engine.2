@@ -34,11 +34,11 @@ int main()
         sf::Color::Green
     ));
 
-    /*engine.addObject<Rectangle>(std::make_shared<Rectangle>(
-        sf::Vector2u(800, 200),
-        sf::Vector2u(00, 500),
+    engine.addObject<Rectangle>(std::make_shared<Rectangle>(
+        sf::Vector2u(50, 50),
+        sf::Vector2u(10, 50),
         sf::Color::Red
-    ));*/
+    ));
     
     //engine.lockViewOnObject(std::make_pair(r.lock()->getClassName(), r.lock()->getID()));
     

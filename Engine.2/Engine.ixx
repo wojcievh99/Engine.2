@@ -60,10 +60,17 @@ export class Engine {
 	}
 	void moveAllObjects() {
 		for (auto const& e : oc._objectMoves) {
-
-			Functor f = e.second.first; f();
-			f = e.second.second; f(); // think that through 
-
+			e.second.lock()->accelerateObject();
+			if (oc._objectWithCollisions.count(e.first)) {
+				if (oc._objectWithCollisions[e.first].lock()->checkNextMove(e.second.lock()->getMoveDir())) {
+					e.second.lock()->moveObject();
+					oc._objectWithCollisions[e.first].lock()->moveBound(e.second.lock()->getMoveDir());
+				}
+				else {
+					oc._objectWithCollisions[e.first].lock()->afterCollision();
+				}
+			}
+			else e.second.lock()->moveObject();
 		}
 	}
 	void updateAllObjects() {

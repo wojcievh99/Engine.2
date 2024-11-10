@@ -9,19 +9,21 @@ export class ObjectPointBound {
 	std::vector<std::weak_ptr<GraphPoint>> _bounds;
 	std::unordered_set<sf::Vector2u, v2u_hash> _numbers;
 
+	uint64_t _adherence;
+
 	std::weak_ptr<GraphPoint> temporary;
 public:
+	ObjectPointBound(uint64_t adherence) : _adherence(adherence) {};
 
 	bool addBound(sf::Vector2u number) {
 		if (_numbers.contains(number)) 
 			return false;
 		_graph.getPoint(number, temporary);
-		temporary.lock()->intersected();
+		temporary.lock()->intersected(_adherence);
 		_bounds.push_back(temporary); 
 		_numbers.insert(number);
 		return true;
 	}
-
 	bool addRectangleBound(sf::Vector2u numberA, sf::Vector2u numberB) {
 		bool condition = true; 
 		for (unsigned int line = numberA.y; line < numberB.y; line++) {
@@ -34,10 +36,20 @@ public:
 
 	void moveBound(sf::Vector2u move) {
 		for (auto&& e : _bounds) {
-			e.lock()->diverged();
+			e.lock()->diverged(_adherence);
 			_graph.getPoint(e.lock()->getNumber() + move, e);
-			e.lock()->intersected();
+			e.lock()->intersected(_adherence);
 		}
 	}
+	std::vector<sf::Vector2u> getVirtuallyMovedBound(sf::Vector2u move) {
+		std::vector<sf::Vector2u> result;
+		for (auto e : _bounds) {
+			result.push_back(e.lock()->getNumber() + move);
+		}
+		return result;
+	}
 
+	std::unordered_set<sf::Vector2u, v2u_hash> getNumbers() {
+		return _numbers;
+	}
 };
