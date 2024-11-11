@@ -11,7 +11,8 @@ export class Collidable : public virtual Base {
 	ObjectPointBound __objectBounds;
 
 public:
-	Collidable(sf::Vector2u size, unsigned int definedBound = 1) : Base(), __definedBound(definedBound), __objectBounds(this->getID()) {
+	Collidable(sf::Vector2u size, unsigned int definedBound = 1) 
+		: Base(), __definedBound(definedBound), __objectBounds(this->getID(), __definedBound) {
 		__objectBounds.addRectangleBound(_position.lock()->getNumber(), _position.lock()->getNumber() + size);
 	}
 
@@ -24,7 +25,7 @@ public:
 		std::vector<sf::Vector2u> nextFrameBound = __objectBounds.getVirtuallyMovedBound(nextMove);
 		nextFrameBound = containerDifference(nextFrameBound, __objectBounds.getNumbers());
 		for (auto e : nextFrameBound) {
-			if (_graph.getPoint(e).lock()->isBlocked(this->getID()) >= __definedBound) {
+			if (!_graph.getPoint(e).lock()->tryBound(this->getID(), __definedBound)) {
 				return false;
 			}
 		}

@@ -23,9 +23,14 @@ export const std::string red("\033[31m");
 export const std::string reset("\033[0m");
 
 // Hash
-export struct v2u_hash {
+export struct v2u_hash { // vector<unsigned int, unsigned int>
 	std::size_t operator()(const sf::Vector2u& p) const {
 		return std::hash<int>{}(p.x) ^ (std::hash<int>{}(p.y) << 1);
+	}
+};
+export struct pID_hash { // pair<ID, unsigned int>
+	std::size_t operator()(const std::pair<uint64_t, unsigned int>& p) const {
+		return p.first;
 	}
 };
 

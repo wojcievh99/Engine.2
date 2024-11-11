@@ -38,13 +38,14 @@ int main()
     engine.addObject<Rectangle>(std::make_shared<Rectangle>(
         sf::Vector2u(50, 50),
         sf::Vector2u(10, 50),
-        sf::Color::Red
+        sf::Color::Red,
+        2
     ));
 
     engine.addObject<Rectangle>(std::make_shared<Rectangle>(
         sf::Vector2u(200, 80),
         sf::Vector2u(50, 200),
-        sf::Color::Red
+        sf::Color::Red, 1
     ));
         
     if (condition) engine.run();

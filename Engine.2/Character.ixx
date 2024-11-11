@@ -12,7 +12,7 @@ export class Character : public virtual Base, public Drawable, public Moveable, 
 
 public:
 	Character(sf::Vector2u position, sf::Vector2u size, sf::Color color)
-		: Base(typeid(this).raw_name(), position), Collidable(size)
+		: Base(typeid(this).raw_name(), position), Collidable(size, 2)
 	{
 
 		_body.setPosition(_position.lock()->getPosition());

@@ -11,8 +11,8 @@ export class Rectangle : public virtual Base, public Drawable, public Collidable
 	sf::RectangleShape _body;
 
 public:
-	Rectangle(sf::Vector2u position, sf::Vector2u size, sf::Color color)
-		: Base(typeid(this).raw_name(), position), Collidable(size)
+	Rectangle(sf::Vector2u position, sf::Vector2u size, sf::Color color, unsigned int bound)
+		: Base(typeid(this).raw_name(), position), Collidable(size, bound)
 	{
 
 		_body.setPosition(_position.lock()->getPosition());
