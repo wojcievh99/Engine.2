@@ -20,7 +20,7 @@ public:
 	bool addBound(sf::Vector2u number) {
 		if (_numbers.contains(number)) 
 			return false;
-		_graph.getPoint(number, temporary);
+		GraphContainer::get().getPoint(number, temporary);
 		temporary.lock()->intersected(_adherence, _definedBound);
 		_bounds.push_back(temporary); 
 		_numbers.insert(number);
@@ -39,13 +39,13 @@ public:
 	void moveBound(sf::Vector2u move) {
 		for (auto&& e : _bounds) {
 			e.lock()->diverged(_adherence, _definedBound);
-			_graph.getPoint(e.lock()->getNumber() + move, e);
+			GraphContainer::get().getPoint(e.lock()->getNumber() + move, e);
 			e.lock()->intersected(_adherence, _definedBound);
 		}
 	}
 	std::vector<sf::Vector2u> getVirtuallyMovedBound(sf::Vector2u move) {
-		std::vector<sf::Vector2u> result;
-		for (auto e : _bounds) {
+		std::vector<sf::Vector2u> result; 
+		for (std::weak_ptr<GraphPoint> e : _bounds) {
 			result.push_back(e.lock()->getNumber() + move);
 		}
 		return result;

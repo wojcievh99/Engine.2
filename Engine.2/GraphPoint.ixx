@@ -15,7 +15,7 @@ public:
 		else 
 			return __objects.size();
 	}
-	bool tryBound(uint64_t id, unsigned int definedBound) {
+	bool tryBound(uint64_t id, unsigned int definedBound) { /// std::RATIO
 		float sumBound = 0; // if it will be more that 1 then the point is full
 		if (!__objects.contains({ id, definedBound })) sumBound = 1.f / float(definedBound);
 		for (const auto& e : __objects) sumBound += (1.f / float(e.second));

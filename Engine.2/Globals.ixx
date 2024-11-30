@@ -5,6 +5,7 @@ export import "SFML/Graphics.hpp";
 
 export import Functor;
 export import Concepts;
+export import Exceptions;
 
 export sf::Clock globalClock;
 
@@ -37,7 +38,7 @@ export struct pID_hash { // pair<ID, unsigned int>
 // Mathematical sets differences defined below. Always: A \ B.
 export 
 std::vector<sf::Vector2u> containerDifference(std::unordered_set<sf::Vector2u, v2u_hash> A, std::vector<sf::Vector2u> B) {
-	for (auto e : B) {
+	for (sf::Vector2u e : B) {
 		if (A.contains(e)) A.erase(e);
 	}	
 	std::vector<sf::Vector2u> v(A.begin(), A.end());

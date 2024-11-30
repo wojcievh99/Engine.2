@@ -1,9 +1,11 @@
 export module Engine;
 
 import Globals;
-import ObjectContainer;
+import Base;
 
-import GraphContainer;
+import Moveable;
+import Collidable;
+import Eventable;
 
 export class Engine {
 	std::unique_ptr<sf::Event> _event;
@@ -17,78 +19,95 @@ export class Engine {
 				break;
 
 			}
-			for (std::pair<uint64_t, std::weak_ptr<Eventable>> e : oc._objectsWithEventsAssociatedWithFunctions) {
-				if (!e.second.lock()->isLocked()) {
+			for (uint64_t e : Base::ObjectContainer::get().tasks.events()) {
+		
+				auto evn_object = std::dynamic_pointer_cast<Eventable>(
+					Base::ObjectContainer::get().getObjectByID(e)
+				);
 
-					for (auto const& [key, func] : e.second.lock()->_keyAssociation)
-						if (!e.second.lock()->_lockedIndKeys.contains(key)
+				if (!evn_object->isLocked()) {
+
+					for (auto const& [key, func] : evn_object->_keyAssociation)
+						if (!evn_object->_lockedIndKeys.contains(key)
 							and _event->type == sf::Event::KeyPressed and _event->key.code == key)
 						{
 							Functor f = func; f();
 						}
-					for (auto const& [key, func] : e.second.lock()->_rKeyAssociation)
-						if (!e.second.lock()->_lockedIndKeys.contains(key)
+					for (auto const& [key, func] : evn_object->_rKeyAssociation)
+						if (!evn_object->_lockedIndKeys.contains(key)
 							and _event->type == sf::Event::KeyReleased and _event->key.code == key)
 						{
-							if (!e.second.lock()->_lockedIndKeyRelease.contains(key)) {
+							if (!evn_object->_lockedIndKeyRelease.contains(key)) {
 								Functor f = func; f();
 							}
-							else e.second.lock()->_lockedIndKeyRelease.erase(key);
+							else evn_object->_lockedIndKeyRelease.erase(key);
 						}
-					for (auto const& [button, func] : e.second.lock()->_buttonAssociation)
-						if (!e.second.lock()->_lockedIndButtons.contains(button)
+					for (auto const& [button, func] : evn_object->_buttonAssociation)
+						if (!evn_object->_lockedIndButtons.contains(button)
 							and _event->type == sf::Event::MouseButtonPressed and _event->mouseButton.button == button)
 						{
 							Functor f = func; f();
 						}
-					for (auto const& [button, func] : e.second.lock()->_rButtonAssociation)
-						if (!e.second.lock()->_lockedIndButtons.contains(button)
+					for (auto const& [button, func] : evn_object->_rButtonAssociation)
+						if (!evn_object->_lockedIndButtons.contains(button)
 							and _event->type == sf::Event::MouseButtonReleased and _event->mouseButton.button == button)
 						{
-							if (!e.second.lock()->_lockedIndButtonRelease.contains(button)) {
+							if (!evn_object->_lockedIndButtonRelease.contains(button)) {
 								Functor f = func; f();
 							}
-							else e.second.lock()->_lockedIndButtonRelease.erase(button);
+							else evn_object->_lockedIndButtonRelease.erase(button);
 						}
 
 				}
 			}
 		}
-	}
+	} 
 	void drawAllObjects() {
-		for (auto const& e : oc._objectDraws) {
+		for (auto const& e : Base::ObjectContainer::get().tasks.draws()) {
 			Functor f = e.second; f();
 		}
 	}
 	void moveAllObjects() {
-		for (auto const& e : oc._objectMoves) {
-			e.second.lock()->accelerateObject();
-			if (oc._objectWithCollisions.count(e.first)) {
-				if (oc._objectWithCollisions[e.first].lock()->checkNextMove(e.second.lock()->getMoveDir())) {
-					e.second.lock()->moveObject();
-					oc._objectWithCollisions[e.first].lock()->moveBound(e.second.lock()->getMoveDir());
+		for (auto const& e : Base::ObjectContainer::get().tasks.moves()) {
+
+			auto mov_object = std::dynamic_pointer_cast<Moveable>(
+				Base::ObjectContainer::get().getObjectByID(e)
+			);
+
+			if (mov_object->getMoveDir() != sf::Vector2u(0, 0))
+				if (auto col_object = std::dynamic_pointer_cast<Collidable>
+					( Base::ObjectContainer::get().getObjectByID(e) )
+					) {
+					if (col_object->checkNextMove(mov_object->getMoveDir())) {
+						mov_object->accelerateObject();
+						mov_object->moveObject();
+						col_object->moveBound(mov_object->getMoveDir());
+					}
+					else {
+						col_object->afterCollision();
+					}
 				}
 				else {
-					oc._objectWithCollisions[e.first].lock()->afterCollision();
+					mov_object->accelerateObject();
+					mov_object->moveObject();
 				}
-			}
-			else e.second.lock()->moveObject();
 		}
 	}
 	void updateAllObjects() {
-		for (auto const& e : oc._objectUpdates) {
+		for (auto const& e : Base::ObjectContainer::get().tasks.updates()) {
 			Functor f = e.second; f();
 		}
 	}
 	void deleteAllObjects() {
-		for (auto const& [className, element] : oc._database) {
-			for (auto const& [id, object] : element) {
+		for (auto const& [id, __] : Base::ObjectContainer::get().getRegister()) {
+			
+			std::shared_ptr<Base> object = Base::ObjectContainer::get().getObjectByID(id);
 				try {
 					if (object == nullptr) throw std::exception("Object Terminated.");
 					if (!object->isObjectAlive()) {
 
 						_deleteMutex.lock();
-						oc.deleteObject(object->getID());
+						Base::ObjectContainer::get().remove(object->getID());
 						_deleteMutex.unlock();
 
 						break;
@@ -97,19 +116,20 @@ export class Engine {
 				catch (const std::exception& err) {
 					break;
 				}
-			}
+			
 		}
 	}
+	
+	Engine() = default;
+	~Engine() = default;
 
 public:
-	Engine() {
-		std::cout << "<- Engine Loading... ->\n";
-	}
+	Engine(const Engine&) = delete;
+	Engine& operator=(const Engine&) = delete;
 
-	template <Base2D T>
-	std::weak_ptr<T> addObject(std::shared_ptr<Base>&& ob) {
-		oc.insertObject(ob);
-		return std::weak_ptr<T>(std::dynamic_pointer_cast<T>(std::move(ob)));
+	inline static Engine& get() {
+		static Engine _instance;
+		return _instance;
 	}
 
 	bool init(
@@ -168,7 +188,7 @@ public:
 
 	}
 
-} inline engine;
+};
 
 /*try {
 						if (viewLock) {

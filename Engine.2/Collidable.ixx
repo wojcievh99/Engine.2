@@ -1,7 +1,9 @@
 export module Collidable;
 
 import Globals;
+
 export import ObjectPointBound;
+import GraphContainer;
 
 import Base;
 
@@ -24,8 +26,8 @@ public:
 	bool checkNextMove(sf::Vector2u nextMove) {
 		std::vector<sf::Vector2u> nextFrameBound = __objectBounds.getVirtuallyMovedBound(nextMove);
 		nextFrameBound = containerDifference(nextFrameBound, __objectBounds.getNumbers());
-		for (auto e : nextFrameBound) {
-			if (!_graph.getPoint(e).lock()->tryBound(this->getID(), __definedBound)) {
+		for (sf::Vector2u e : nextFrameBound) {
+			if (!GraphContainer::get().getPoint(e).lock()->tryBound(this->getID(), __definedBound)) {
 				return false;
 			}
 		}

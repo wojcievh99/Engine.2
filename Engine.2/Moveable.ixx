@@ -3,11 +3,13 @@ export module Moveable;
 import Globals;
 import Base;
 
+import GraphContainer;
+
 export class Moveable : public virtual Base {
 	sf::Vector2u __moveDirection;
 	sf::Vector2u __acceleration;
 public:
-	Moveable() : Base() {};
+	Moveable() {};
 
 	void setMoveDirection(sf::Vector2u _newMoveDir) { __moveDirection = _newMoveDir; }
 	void setAccDirection(sf::Vector2u _newAccDir) { __acceleration = _newAccDir; }
@@ -18,7 +20,7 @@ public:
 	void setAccDirectionY(unsigned int Y) { __acceleration.x = Y; }
 
 	virtual void moveObject() {
-		_graph.getPoint(_position.lock()->getNumber() + this->getMoveDir(), _position);
+		GraphContainer::get().getPoint(_position.lock()->getNumber() + this->getMoveDir(), _position);
 	};
 	void accelerateObject() {
 		__moveDirection += __acceleration;
