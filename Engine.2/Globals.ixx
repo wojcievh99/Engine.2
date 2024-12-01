@@ -10,10 +10,12 @@ export import Exceptions;
 export sf::Clock globalClock;
 
 export unsigned int __framerate;
+// distance between each point of a graph
 export float __graphPointDistance;
 
 export std::unique_ptr<sf::RenderWindow> window;
 
+// for future development: 
 //ViewLock Variables -> move to engine
 //export sf::View view;
 //export std::pair<std::string, uint64_t> viewObjectData;
@@ -23,7 +25,7 @@ export uint64_t globalID = 0;
 export const std::string red("\033[31m");
 export const std::string reset("\033[0m");
 
-// Hash
+// Hashes for containers
 export struct v2u_hash { // vector<unsigned int, unsigned int>
 	std::size_t operator()(const sf::Vector2u& p) const {
 		return std::hash<int>{}(p.x) ^ (std::hash<int>{}(p.y) << 1);
@@ -35,7 +37,7 @@ export struct pID_hash { // pair<ID, unsigned int>
 	}
 };
 
-// Mathematical sets differences defined below. Always: A \ B.
+// Mathematical sets differences defined below. Both: A \ B.
 export 
 std::vector<sf::Vector2u> containerDifference(std::unordered_set<sf::Vector2u, v2u_hash> A, std::vector<sf::Vector2u> B) {
 	for (sf::Vector2u e : B) {

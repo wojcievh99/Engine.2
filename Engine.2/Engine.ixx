@@ -1,6 +1,6 @@
 export module Engine;
 
-import Globals;
+export import Globals;
 import Base;
 
 import Moveable;
@@ -11,6 +11,7 @@ export class Engine {
 	std::unique_ptr<sf::Event> _event;
 	std::mutex _deleteMutex;
 
+	// algorithms/calls for handling all tasks:
 	void checkAndExecuteEventsInAllObjects() {
 		while (window->pollEvent(*_event)) {
 			if (_event->type == sf::Event::Closed) {
@@ -127,7 +128,7 @@ public:
 	Engine(const Engine&) = delete;
 	Engine& operator=(const Engine&) = delete;
 
-	inline static Engine& get() {
+	static Engine& get() {
 		static Engine _instance;
 		return _instance;
 	}
@@ -190,6 +191,8 @@ public:
 
 };
 
+
+// for future development:
 /*try {
 						if (viewLock) {
 							std::weak_ptr<Base> _viewObject = oc._database[viewObjectData.first][viewObjectData.second];

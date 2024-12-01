@@ -2,26 +2,33 @@ export module Eventable;
 
 import Globals;
 
+// inherit from it in your object if your object 
+// should respond to specified keyboards/mouse events
 export class Eventable {
 	bool __stopCheckingEvents;
 public:
 	Eventable() : __stopCheckingEvents(false) {}
 	~Eventable() { clearAllAssociations(); }
 
-	std::set<sf::Keyboard::Key> _currentlyHeldKeys;
-	std::set<sf::Mouse::Button> _currentlyHeldButtons;
+	// held currently at the moment
+	std::set<sf::Keyboard::Key>						_currentlyHeldKeys;
+	std::set<sf::Mouse::Button>						_currentlyHeldButtons;
 
-	std::unordered_map<sf::Keyboard::Key, Functor> _keyAssociation;
-	std::unordered_map<sf::Mouse::Button, Functor> _buttonAssociation;
+	// associations click key-event and click button-event
+	std::unordered_map<sf::Keyboard::Key, Functor>	_keyAssociation;
+	std::unordered_map<sf::Mouse::Button, Functor>	_buttonAssociation;
 
-	std::unordered_map<sf::Keyboard::Key, Functor> _rKeyAssociation;
-	std::unordered_map<sf::Mouse::Button, Functor> _rButtonAssociation;
+	// associations release key-event and release button-event
+	std::unordered_map<sf::Keyboard::Key, Functor>	_rKeyAssociation;
+	std::unordered_map<sf::Mouse::Button, Functor>	_rButtonAssociation;
 
-	std::set<sf::Keyboard::Key> _lockedIndKeys;
-	std::set<sf::Mouse::Button> _lockedIndButtons;
+	// if event should not happen at click for some time 
+	std::set<sf::Keyboard::Key>						_lockedIndKeys;
+	std::set<sf::Mouse::Button>						_lockedIndButtons;
 
-	std::set<sf::Keyboard::Key> _lockedIndKeyRelease;
-	std::set<sf::Mouse::Button> _lockedIndButtonRelease;
+	// if event should not happen at release for some time 
+	std::set<sf::Keyboard::Key>						_lockedIndKeyRelease;
+	std::set<sf::Mouse::Button>						_lockedIndButtonRelease;
 
 	// press
 	void addKeyAssociation(sf::Keyboard::Key key, Functor func) {
@@ -56,17 +63,25 @@ public:
 		_lockedIndButtonRelease.clear();
 	}
 
+	// lock/unlock every single event in object
 	void lockEvents() {
 		__stopCheckingEvents = true; _currentlyHeldKeys.clear(); _currentlyHeldButtons.clear();
 	}
-	void unlockEvents() { __stopCheckingEvents = false; }
+	void unlockEvents() { 
+		__stopCheckingEvents = false; 
+	}
 
+	// lock/unlock specific event in object
 	void lockIndEvent(sf::Keyboard::Key k) { _lockedIndKeys.insert(k); }
 	void lockIndEvent(sf::Mouse::Button b) { _lockedIndButtons.insert(b); }
 
 	void unlockIndEvent(sf::Keyboard::Key k) { _lockedIndKeys.erase(k); }
 	void unlockIndEvent(sf::Mouse::Button b) { _lockedIndButtons.erase(b); }
 
+	// lock for one time 
+	// first release after calling one of those functions 
+	// will not call the event but next and every other will 
+	// (if it is not called again of course)
 	void lockIndRelease(sf::Keyboard::Key k) {
 		_lockedIndKeyRelease.insert(k); _currentlyHeldKeys.erase(k);
 	}
@@ -74,6 +89,7 @@ public:
 		_lockedIndButtonRelease.insert(b); _currentlyHeldButtons.erase(b);
 	}
 
+	// check if all events are locked
 	bool isLocked() { return __stopCheckingEvents; }
 
 };

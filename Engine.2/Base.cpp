@@ -6,13 +6,11 @@ import Moveable;
 import Collidable;
 import Eventable;
 
+// SomeObject::create([args for that object]); <- creates the object in engine
 template<Derived D, typename... Args>
 static std::shared_ptr<Base> Base::create(Args&&... args) {
-	//static_assert(std::is_base_of<Base2, Derived>::value, "Derived class must derive from Base2");
 
 	auto obj = std::make_shared<D>(std::forward<Args>(args)...);
-	//auto obj = std::shared_ptr<Derived>(new Derived(std::forward<Args>(args)...));
-
 	Base::ObjectContainer::get().add(obj);
 
 	return obj;
@@ -35,24 +33,29 @@ Base::ObjectContainer& Base::ObjectContainer::get() {
 }
 
 void Base::ObjectContainer::add(std::shared_ptr<Base>& r) {
-	Base::ObjectContainer::get()._database[r->getClassName()][r->getID()] = r;
-	Base::ObjectContainer::get()._membership[r->getID()] = r->getClassName();
+	
+	// Adding object to the engine and spliting future tasks:
 
-	if (std::shared_ptr<Drawable> x = std::dynamic_pointer_cast<Drawable>(r)) {
-		Base::ObjectContainer::get().tasks._objectDraws[r->getID()] = Functor([x]() { x->drawObject(); });
-	}
-	if (std::shared_ptr<Updateable> x = std::dynamic_pointer_cast<Updateable>(r)) {
-		Base::ObjectContainer::get().tasks._objectUpdates[r->getID()] = Functor([x]() { x->updateObject(); });
-	}
-	if (std::shared_ptr<Moveable> x = std::dynamic_pointer_cast<Moveable>(r)) {
-		Base::ObjectContainer::get().tasks._objectMoves.insert(r->getID());
-	}
-	if (std::shared_ptr<Collidable> x = std::dynamic_pointer_cast<Collidable>(r)) {
-		Base::ObjectContainer::get().tasks._objectWithCollisions.insert(r->getID());
-	}
-	if (std::shared_ptr<Eventable> x = std::dynamic_pointer_cast<Eventable>(r)) {
-		Base::ObjectContainer::get().tasks._objectsWithEventsAssociatedWithFunctions.insert(r->getID());
-	}
+	Base::ObjectContainer::get().				_database[r->getClassName()][r->getID()] = r;
+	Base::ObjectContainer::get().				_membership[r->getID()] = r->getClassName();
+
+	// Polymorphic: 
+
+	if (std::shared_ptr<Drawable> x = std::dynamic_pointer_cast<Drawable>(r)) 
+		Base::ObjectContainer::get().tasks.		_objectDraws[r->getID()] = Functor([x]() { x->drawObject(); });
+
+	if (std::shared_ptr<Updateable> x = std::dynamic_pointer_cast<Updateable>(r)) 
+		Base::ObjectContainer::get().tasks.		_objectUpdates[r->getID()] = Functor([x]() { x->updateObject(); });
+
+	if (std::shared_ptr<Moveable> x = std::dynamic_pointer_cast<Moveable>(r)) 
+		Base::ObjectContainer::get().tasks.		_objectMoves.insert(r->getID());
+
+	if (std::shared_ptr<Collidable> x = std::dynamic_pointer_cast<Collidable>(r)) 
+		Base::ObjectContainer::get().tasks.		_objectWithCollisions.insert(r->getID());
+
+	if (std::shared_ptr<Eventable> x = std::dynamic_pointer_cast<Eventable>(r)) 
+		Base::ObjectContainer::get().tasks.		_objectsWithEventsAssociatedWithFunctions.insert(r->getID());
+	
 }
 
 void Base::ObjectContainer::remove(uint64_t _id) {
@@ -70,4 +73,3 @@ void Base::ObjectContainer::remove(uint64_t _id) {
 	Base::ObjectContainer::get()		._membership.erase(_id);
 
 }
-

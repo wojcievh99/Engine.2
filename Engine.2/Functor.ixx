@@ -2,6 +2,7 @@ export module Functor;
 
 import std;
 
+// Functor class mainly used for object's tasks
 export class Functor {
 	std::function<void()> __body;
 	std::vector<Functor> __body_addition;

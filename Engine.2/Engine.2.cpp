@@ -10,18 +10,11 @@ import Character;
 int main()
 {
 
-    bool condition = Engine::get().init(std::make_pair(1000, 1200), "TEST", false, 60, 3.f);
+    bool condition = Engine::get().init(std::make_pair(1000, 1200), "TEST", false, 60, 3);
     
     Character::create<Character>(sf::Vector2u(100, 100),
         sf::Vector2u(30, 30),
         sf::Color::Green);
-    
-
-    /*auto r = engine.addObject<Character>(std::make_shared<Character>(
-        sf::Vector2u(100, 100),
-        sf::Vector2u(30, 30),
-        sf::Color::Green
-    ));*/
         
     if (condition) Engine::get().run();
 

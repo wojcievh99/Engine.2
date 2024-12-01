@@ -5,12 +5,13 @@ import Base;
 
 import GraphContainer;
 
+// inherit from it in your object if your object 
+// should move/be able to move
 export class Moveable : public virtual Base {
 	sf::Vector2u __moveDirection;
 	sf::Vector2u __acceleration;
 public:
-	Moveable() {};
-
+	
 	void setMoveDirection(sf::Vector2u _newMoveDir) { __moveDirection = _newMoveDir; }
 	void setAccDirection(sf::Vector2u _newAccDir) { __acceleration = _newAccDir; }
 

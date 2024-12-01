@@ -9,6 +9,7 @@ static bool operator == (sf::Vector2u a, sf::Vector2u b)
 	return false;
 };
 
+// Container class for graph points
 export class GraphContainer {
 	std::unordered_map<sf::Vector2u, std::shared_ptr<GraphPoint>, v2u_hash> __container;
 
@@ -28,6 +29,7 @@ export class GraphContainer {
 
 public:
 
+	// only one instance 
 	static GraphContainer& get() {
 		static GraphContainer _instance;
 		return _instance;
@@ -40,6 +42,11 @@ public:
 		return true;
 	}
 
+	// If the point doesn't exist then it is created.
+	// Usually getPoint() is called when point is needed 
+	// to stand on it or it is already defined so there
+	// will not be a single point that exists but was
+	// never used at least once.
 	void getPoint(sf::Vector2u number, std::weak_ptr<GraphPoint>& point) {
 		if (__container.count(number)) { // always 1 or 0
 			point = __container[number]; return;
@@ -49,6 +56,8 @@ public:
 		return getPoint(number, point);
 	}
 
+	// exacly the same but returns weak_ptr to that point
+	// instead of changing reference given as a second argument 
 	std::weak_ptr<GraphPoint> getPoint(sf::Vector2u number) {
 		if (__container.count(number))
 			return __container[number];
