@@ -11,13 +11,12 @@ export class Rectangle : public virtual Base, public Drawable, public Moveable, 
 	sf::RectangleShape _body;
 
 public:
-	Rectangle(sf::Vector2u position, sf::Vector2u size, sf::Color color, unsigned int bound)
-		: Collidable(size, bound)
+	Rectangle(sf::Vector2u position, sf::Vector2u size, sf::Color color)
+		: Base(position), Collidable(size)
 	{
-		set(typeid(this).raw_name(), position);
 
 		_body.setPosition(_position.lock()->getPosition());
-		_body.setSize(sf::Vector2f(size.x * __graphPointDistance, size.y * __graphPointDistance));
+		_setSize(_body, size);
 		_body.setFillColor(color); 
 
 	}
@@ -25,10 +24,6 @@ public:
 	void drawObject() {
 		_body.setPosition(_position.lock()->getPosition());
 		window->draw(_body);
-	}
-
-	void afterCollision() {
-		this->setMoveDirection(sf::Vector2u(0, 0));
 	}
 
 };

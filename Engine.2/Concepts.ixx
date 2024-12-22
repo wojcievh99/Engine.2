@@ -7,6 +7,6 @@ import std;
 // only class Base itself meets this conditions in this project
 export template<typename D>
 concept Derived = requires (D d) {
-	{ d.getClassName() } -> std::convertible_to<std::string>;
+	{ d.getType() } -> std::convertible_to<std::type_index>;
 	{ d.getID() } -> std::convertible_to<std::uint64_t>;
 };

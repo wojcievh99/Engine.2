@@ -1,6 +1,7 @@
 export module Eventable;
 
 import Globals;
+import Functor;
 
 // inherit from it in your object if your object 
 // should respond to specified keyboards/mouse events

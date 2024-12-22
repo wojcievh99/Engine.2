@@ -1,6 +1,8 @@
 export module ObjectHolder;
 import Globals;
 
+import Functor;
+
 // defines held objects for tasks 
 export class ObjectHolder {
 
@@ -30,5 +32,5 @@ public:
 	}
 
 	// friend class instead of setters
-	friend class Base;
+	friend class ObjectContainer;
 };

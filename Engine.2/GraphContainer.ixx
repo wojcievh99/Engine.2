@@ -11,12 +11,16 @@ static bool operator == (sf::Vector2u a, sf::Vector2u b)
 
 // Container class for graph points
 export class GraphContainer {
+
 	std::unordered_map<sf::Vector2u, std::shared_ptr<GraphPoint>, v2u_hash> __container;
+	std::unique_ptr<float> __graphPointDistance;
 
 	void _createPoint(sf::Vector2u number) {		
 		addPoint(
 			std::make_shared<GraphPoint>(
-				sf::Vector2f((float)number.x * __graphPointDistance, (float)number.y * __graphPointDistance),
+				sf::Vector2f(
+					(float)number.x * *__graphPointDistance, (float)number.y * *__graphPointDistance
+				),
 				sf::Vector2u(number.x, number.y))
 		);
 	}
@@ -33,6 +37,18 @@ public:
 	static GraphContainer& get() {
 		static GraphContainer _instance;
 		return _instance;
+	}
+
+	// only once
+	bool setGraphPointDistance(float _gpd) {
+		if (!__graphPointDistance) {
+			__graphPointDistance = std::make_unique<float>(_gpd);
+			return true;
+		}
+		return false;
+	}
+	float getGraphPointDistance() {
+		return *__graphPointDistance;
 	}
 
 	bool addPoint(std::shared_ptr<GraphPoint> newPoint) {
