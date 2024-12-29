@@ -6,44 +6,41 @@ import Moveable;
 import Eventable;
 import Updateable;
 import Collidable;
+import Deleteable;
 
-export class Character : public virtual Base, public Drawable, public Moveable, public Eventable, public Collidable {
+export class Character : public virtual Base, public Deleteable, public Drawable, public Moveable, public Eventable, public Collidable {
 	sf::RectangleShape _body;
 
 public:
 	Character(sf::Vector2u position, sf::Vector2u size, sf::Color color)
 		: Base(position), Collidable(size)
 	{
-
-		_body.setPosition(_position.lock()->getPosition());
+		correctPosition(_body);
 		_setSize(_body, size);
 		_body.setFillColor(color);
 
+		this->setAccDirection(sf::Vector2i(0, 1));
+
 		this->addKeyAssociation(sf::Keyboard::D, Functor(
 			[this]() {
-				this->setMoveDirection(sf::Vector2u(5, 0));
+				this->setMoveDirectionX(1);
 			}
 		));
 		this->addKeyAssociation(sf::Keyboard::A, Functor(
 			[this]() {
-				this->setMoveDirection(sf::Vector2u(-5, 0));
+				this->setMoveDirectionX(-1);
 			}
 		));
-		this->addKeyAssociation(sf::Keyboard::W, Functor(
+		this->addKeyAssociation(sf::Keyboard::Space, Functor(
 			[this]() {
-				this->setMoveDirection(sf::Vector2u(0, -5));
-			}
-		));
-		this->addKeyAssociation(sf::Keyboard::S, Functor(
-			[this]() {
-				this->setMoveDirection(sf::Vector2u(0, 5));
+				this->setMoveDirectionY(-10);
 			}
 		));
 		
 	}
 
-	void drawObject() {
-		_body.setPosition(_position.lock()->getPosition());
+	void drawObject() override {
+		correctPosition(_body);
 		window->draw(_body);
 	}
 

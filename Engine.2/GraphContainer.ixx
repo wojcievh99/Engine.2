@@ -9,6 +9,12 @@ static bool operator == (sf::Vector2u a, sf::Vector2u b)
 	return false;
 };
 
+export
+sf::Vector2u operator + (sf::Vector2u a, sf::Vector2i b)
+{
+	return sf::Vector2u(a.x + b.x, a.y + b.y);
+};
+
 // Container class for graph points
 export class GraphContainer {
 

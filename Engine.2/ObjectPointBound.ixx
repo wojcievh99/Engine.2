@@ -46,7 +46,7 @@ public:
 	}
 
 	// move every point of specified above shape by given vector of displacement
-	void moveBound(sf::Vector2u move) {
+	void moveBound(sf::Vector2i move) {
 		for (auto&& e : _bounds) {
 			e.lock()->diverged(_adherence, _definedBound);
 			GraphContainer::get().getPoint(e.lock()->getNumber() + move, e);

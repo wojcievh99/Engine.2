@@ -24,12 +24,13 @@ public:
 	// Future development can add an option to add a txt file with any 
 	// defined inside shape that will be taken instead of rectangle
 	Collidable(sf::Vector2u size, unsigned int definedBound = 1);
+	~Collidable();
 
 	virtual void afterCollision() { };
 	// with object move (defined in class Moveable) comes move bound as well
-	void moveBound(sf::Vector2u move);
+	void moveBound(sf::Vector2i move);
 
 	// checks if next move will cause an intersection with other object
 	// this intersection-collision is defined in class GraphPoint in function tryBound()
-	bool checkNextMove(sf::Vector2u nextMove);
+	bool checkNextMove(sf::Vector2i nextMove);
 };

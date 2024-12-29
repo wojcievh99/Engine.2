@@ -21,6 +21,7 @@ export class ObjectContainer {
 
 	// fundamental database; not designed to use outside of this class.
 	std::unordered_map<uint64_t, std::shared_ptr<Base>> _database;
+	std::list<uint64_t> _bin;
 
 public:
 	// only one instance
@@ -35,6 +36,9 @@ public:
 	// for when there is no other option that to use fundamental database
 	std::shared_ptr<Base>& getObjectByID(uint64_t _id) {
 		return _database[_id];
+	}
+	std::list<uint64_t>& getBin() {
+		return _bin;
 	}
 	
 

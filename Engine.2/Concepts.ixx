@@ -10,3 +10,9 @@ concept Derived = requires (D d) {
 	{ d.getType() } -> std::convertible_to<std::type_index>;
 	{ d.getID() } -> std::convertible_to<std::uint64_t>;
 };
+
+export template <typename P>
+concept Positionable = requires (P p) {
+	{ p.setPosition };
+	{ p.getPosition };
+};

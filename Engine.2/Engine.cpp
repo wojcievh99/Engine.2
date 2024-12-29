@@ -9,10 +9,35 @@ import Moveable;
 import Collidable;
 
 unsigned int __framerate;
+bool __wop;
+
+sf::Mutex _deleteMutexOne;
+sf::Mutex _deleteMutexTwo;
+sf::Mutex _deleteMutexThree;
 
 Engine& Engine::get() {
 	static Engine _instance;
 	return _instance;
+}
+
+// helper for handling threads
+static void runFastThread(const std::function<void()>& operation) {
+	while (__wop) {
+		operation();
+	}
+}
+static void runThread(const std::function<void()>& operation) {
+		sf::Int32 prevTime = globalClock.getElapsedTime().asMilliseconds();
+
+		while (__wop) {
+			sf::Int32 elapsedTime = globalClock.getElapsedTime().asMilliseconds();
+			if (elapsedTime - prevTime > 1000 / (__framerate)) {
+				prevTime = elapsedTime;
+
+				operation();
+			}
+		}
+
 }
 
 sf::Event _event;
@@ -20,7 +45,7 @@ void Engine::checkAndExecuteEventsInAllObjects() {
 	while (window->pollEvent(_event)) {
 		if (_event.type == sf::Event::Closed) {
 
-			window->close();
+			__wop = false;
 			break;
 
 		}
@@ -42,10 +67,7 @@ void Engine::checkAndExecuteEventsInAllObjects() {
 					if (!evn_object->_lockedIndKeys.contains(key)
 						and _event.type == sf::Event::KeyReleased and _event.key.code == key)
 					{
-						if (!evn_object->_lockedIndKeyRelease.contains(key)) {
 							Functor f = func; f();
-						}
-						else evn_object->_lockedIndKeyRelease.erase(key);
 					}
 				for (auto const& [button, func] : evn_object->_buttonAssociation)
 					if (!evn_object->_lockedIndButtons.contains(button)
@@ -57,41 +79,61 @@ void Engine::checkAndExecuteEventsInAllObjects() {
 					if (!evn_object->_lockedIndButtons.contains(button)
 						and _event.type == sf::Event::MouseButtonReleased and _event.mouseButton.button == button)
 					{
-						if (!evn_object->_lockedIndButtonRelease.contains(button)) {
 							Functor f = func; f();
-						}
-						else evn_object->_lockedIndButtonRelease.erase(button);
 					}
 
 			}
 		}
 	}
 }
-void Engine::moveAllObjects() {
+void Engine::moveAllObjectsAndCheckCollisions() {
+	_deleteMutexOne.lock();
 	for (auto const& e : ObjectContainer::get().tasks.moves()) {
 
 		auto mov_object = std::dynamic_pointer_cast<Moveable>(
 			ObjectContainer::get().getObjectByID(e)
 		);
 
-		if (mov_object->getMoveDir() != sf::Vector2u(0, 0))
+		if (mov_object->getMoveDir() != sf::Vector2i(0, 0))
 			if (auto col_object = std::dynamic_pointer_cast<Collidable>
 				(ObjectContainer::get().getObjectByID(e))
-				) {
+				) 
+			{
 				if (col_object->checkNextMove(mov_object->getMoveDir())) {
-					mov_object->accelerateObject();
 					mov_object->moveObject();
 					col_object->moveBound(mov_object->getMoveDir());
+
+					if (col_object->checkNextMove(mov_object->getMoveDir() + mov_object->getAccDir()))
+						mov_object->accelerateObject();
 				}
-				else {
+				else
+				{
+					sf::Vector2i _dir = mov_object->getMoveDir() - 1;
+					while (!col_object->checkNextMove(_dir)) {
+						_dir = _dir - 1;
+					}
+					if (_dir != sf::Vector2i(0, 0)) {
+						mov_object->moveOnce(_dir);
+						col_object->moveBound(_dir);
+					}
+
+					if (!col_object->checkNextMove(sf::Vector2i(mov_object->getMoveDir().x, 0)))
+						mov_object->setMoveDirectionX(0);
+					if (!col_object->checkNextMove(sf::Vector2i(0, mov_object->getMoveDir().y)))
+						mov_object->setMoveDirectionY(0);
+
 					col_object->afterCollision();
-				}
+				}		
 			}
 			else {
 				mov_object->accelerateObject();
 				mov_object->moveObject();
 			}
+		else {
+			mov_object->accelerateObject();
+		}
 	}
+	_deleteMutexOne.unlock();
 }
 
 void Engine::drawAllObjects() {
@@ -100,12 +142,26 @@ void Engine::drawAllObjects() {
 	}
 }
 void Engine::updateAllObjects() {
+	_deleteMutexThree.lock();
 	for (auto const& e : ObjectContainer::get().tasks.updates()) {
 		Functor f = e.second; f();
 	}
+	_deleteMutexThree.unlock();
 }
 void Engine::deleteAllObjects() {
-	
+	if (ObjectContainer::get().getBin().size()) {
+		_deleteMutexOne.lock();
+		_deleteMutexTwo.lock();
+		_deleteMutexThree.lock();
+		
+		uint64_t _id = ObjectContainer::get().getBin().front();
+		ObjectContainer::get().remove(_id);
+		ObjectContainer::get().getBin().pop_front();
+
+		_deleteMutexOne.unlock();
+		_deleteMutexTwo.unlock();
+		_deleteMutexThree.unlock();
+	}
 }
 
 void Engine::init(
@@ -134,29 +190,41 @@ void Engine::run() {
 	sf::Int32 prevTime = globalClock.getElapsedTime().asMilliseconds();
 
 	if (window) {
-		while (window->isOpen()) {
+		__wop = true;
+
+		sf::Thread moveThread(runThread, &Engine::moveAllObjectsAndCheckCollisions);
+		sf::Thread updateThread(runThread, &Engine::updateAllObjects);
+		sf::Thread deleteThread(runThread, &Engine::deleteAllObjects);
+
+		moveThread.launch();
+		updateThread.launch();
+		deleteThread.launch();
+
+		while (__wop) {
 			sf::Int32 elapsedTime = globalClock.getElapsedTime().asMilliseconds();
 			if (elapsedTime - prevTime > 1000 / (__framerate)) {
 				prevTime = elapsedTime;
 
-				_deleteMutex.lock();
+				_deleteMutexTwo.lock();
 
 				checkAndExecuteEventsInAllObjects();
-				moveAllObjects();
-				updateAllObjects();
-				deleteAllObjects();
 
 				window->clear();
 				drawAllObjects();
 				window->display();
 
-				_deleteMutex.unlock();
-
+				_deleteMutexTwo.unlock();
 			}
 		}
+		window->close();
+
+		moveThread.wait();
+		updateThread.wait();
+		deleteThread.wait();
+
 	}
 	else {
-		std::cout << "!- Init the window -!\n";
+		std::cout << red << "!- Init the window -!\n" << reset;
 	}
 
 }

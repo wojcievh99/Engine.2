@@ -8,15 +8,14 @@ import Concepts;
 
 // all implementations in Engine.cpp
 export class Engine {
-	std::mutex _deleteMutex;
 
 	// algorithms/calls for handling all tasks:
-	void checkAndExecuteEventsInAllObjects();
-	void moveAllObjects();
+	static void checkAndExecuteEventsInAllObjects();
+	static void moveAllObjectsAndCheckCollisions();
 
-	void drawAllObjects();
-	void updateAllObjects();
-	void deleteAllObjects();
+	static void drawAllObjects();
+	static void updateAllObjects();
+	static void deleteAllObjects();
 	
 	Engine() = default;
 	~Engine() = default;
@@ -40,7 +39,7 @@ public:
 
 	void init(
 		std::pair<unsigned int, unsigned int> _windowSize, std::string _windowName,
-		bool _resizable = false, unsigned int _framerate = 60, unsigned int _pd = 1);
+		bool _resizable = false, unsigned int _framerate = 60, unsigned int _pd = 2);
 
 	void run();
 

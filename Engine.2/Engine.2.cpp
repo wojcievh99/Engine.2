@@ -17,10 +17,10 @@ import Character;
 Wzorce Projektowe na kiedyś
 
 Przed code review: 
-Wielowątkowość
+Wielowątkowość [+]
 Wydajność forów
-Optymalizacja Delete (stos, kolejka zamiast zmiennej 'alive')
-Optymalizacja Drawable (z class Transformable)
+Optymalizacja Delete (stos, kolejka zamiast zmiennej 'alive') [+]
+Optymalizacja Drawable (z class Transformable) [+-]
 
 Code review:
 przemyślana Obsługa Wyjątków
@@ -29,17 +29,18 @@ przemyślana Obsługa Wyjątków
 int main()
 {
 
-    Engine::get().init(std::make_pair(1000, 1200), "TEST", false, 60, 1);
+    Engine::get().init(std::make_pair(1000, 1200), "TEST", false, 60, 3);
     
 	Engine::get().create<Rectangle>(
-        sf::Vector2u(100, 100), sf::Vector2u(100, 100), sf::Color::Red
+        sf::Vector2u(10, 200), sf::Vector2u(100, 10), sf::Color::Red
+    );
+    Engine::get().create<Rectangle>(
+        sf::Vector2u(50, 220), sf::Vector2u(200, 10), sf::Color::Red
     );
 	Engine::get().create<Character>(
-		sf::Vector2u(200, 200), sf::Vector2u(100, 100), sf::Color::Green
+		sf::Vector2u(100, 100), sf::Vector2u(10, 15), sf::Color::Green
 	);
-
         
     Engine::get().run();
-
     return 0;
 }

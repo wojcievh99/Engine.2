@@ -3,16 +3,17 @@ export module Base;
 import Globals;
 import GraphContainer;
 
+import Concepts;
+
 export class Base {
 	std::uint64_t __object_id;
 protected:
 	std::weak_ptr<GraphPoint> _position;
-	bool _object_alive;
 
 public:
 	Base(sf::Vector2u _pos = sf::Vector2u(0, 0)) {
 		GraphContainer::get().getPoint(_pos, _position);
-		this->__object_id = ++globalID; _object_alive = true;
+		this->__object_id = ++globalID;
 	}
 	virtual ~Base() = default;
 
@@ -25,6 +26,11 @@ public:
 		c.setRadius(r * graph_point_distance);
 	}
 
+	template <Positionable P>
+	void correctPosition(P& body) {
+		body.setPosition(_position.lock()->getPosition());
+	}
+
 	std::weak_ptr<GraphPoint> getPosition() const {
 		return _position;
 	};
@@ -35,9 +41,4 @@ public:
 	virtual std::type_index getType() {
 		return typeid(*this);
 	}
-
-	bool isObjectAlive() const {
-		return _object_alive;
-	}
-	
 };
