@@ -1,8 +1,9 @@
 module Engine;
 
 import Globals;
-import ObjectContainer;
 import GraphContainer;
+
+import Exceptions;
 
 import Eventable;
 import Moveable;
@@ -11,21 +12,18 @@ import Collidable;
 unsigned int __framerate;
 bool __wop;
 
+// Gates for all threads
 sf::Mutex _deleteMutexOne;
 sf::Mutex _deleteMutexTwo;
 sf::Mutex _deleteMutexThree;
 
+// Only one instance of Engine is allowed
 Engine& Engine::get() {
 	static Engine _instance;
 	return _instance;
 }
 
 // helper for handling threads
-static void runFastThread(const std::function<void()>& operation) {
-	while (__wop) {
-		operation();
-	}
-}
 static void runThread(const std::function<void()>& operation) {
 		sf::Int32 prevTime = globalClock.getElapsedTime().asMilliseconds();
 
@@ -189,7 +187,8 @@ void Engine::init(
 void Engine::run() {
 	sf::Int32 prevTime = globalClock.getElapsedTime().asMilliseconds();
 
-	if (window) {
+	try {
+		if (!window) throw uninit_window_run();
 		__wop = true;
 
 		sf::Thread moveThread(runThread, &Engine::moveAllObjectsAndCheckCollisions);
@@ -223,8 +222,9 @@ void Engine::run() {
 		deleteThread.wait();
 
 	}
-	else {
-		std::cout << red << "!- Init the window -!\n" << reset;
+	catch (const std::exception& err) {
+		std::cerr << "Fatal Error: " << red << err.what() << reset << std::endl;
+		return;
 	}
 
 }

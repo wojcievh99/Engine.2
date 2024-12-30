@@ -6,13 +6,16 @@ import Base;
 import ObjectContainer;
 import Concepts;
 
-// all implementations in Engine.cpp
+import Exceptions;
+
+// All implementations in Engine.cpp
+// 
+// Singleton: only one instance of Engine is allowed
 export class Engine {
 
 	// algorithms/calls for handling all tasks:
 	static void checkAndExecuteEventsInAllObjects();
 	static void moveAllObjectsAndCheckCollisions();
-
 	static void drawAllObjects();
 	static void updateAllObjects();
 	static void deleteAllObjects();
@@ -21,6 +24,7 @@ export class Engine {
 	~Engine() = default;
 
 public:
+
 	Engine(const Engine&) = delete;
 	Engine& operator=(const Engine&) = delete;
 
@@ -28,13 +32,23 @@ public:
 
 	template<Derived T, typename... Args>
 	std::weak_ptr<T> create(Args&&... args) {
+		
+		try {
+			if (!window) throw uninit_window_create();
 
-		auto object = std::make_shared<T>(std::forward<Args>(args)...);
-		auto projected_to_base = std::static_pointer_cast<Base>(object);
-		ObjectContainer::get().add(projected_to_base);
+			auto object = std::make_shared<T>(std::forward<Args>(args)...);
+			auto projected_to_base = std::static_pointer_cast<Base>(object);
+			ObjectContainer::get().add(projected_to_base);
 
-		std::weak_ptr<T> result = object;
-		return std::move(result);
+			std::weak_ptr<T> result = object;
+			return std::move(result);
+
+		}
+		catch (const std::exception& err) {
+			std::cerr << "Fatal Error: " << red << err.what() << reset << std::endl;
+			return std::weak_ptr<T>();
+		}
+
 	}
 
 	void init(

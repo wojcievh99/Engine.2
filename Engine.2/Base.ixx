@@ -5,6 +5,8 @@ import GraphContainer;
 
 import Concepts;
 
+// Every user created object has to inherit from this class
+// All basics traits are here
 export class Base {
 	std::uint64_t __object_id;
 protected:
@@ -17,6 +19,8 @@ public:
 	}
 	virtual ~Base() = default;
 
+	// Use when specifing size
+	// Choose the correct function for user's case
 	void _setSize(sf::RectangleShape& r, sf::Vector2u _size) {
 		auto graph_point_distance = GraphContainer::get().getGraphPointDistance();
 		r.setSize(sf::Vector2f(_size.x * graph_point_distance, _size.y * graph_point_distance));
@@ -26,6 +30,8 @@ public:
 		c.setRadius(r * graph_point_distance);
 	}
 
+	// Use when position of body in user's object 
+	// might differ from the true position
 	template <Positionable P>
 	void correctPosition(P& body) {
 		body.setPosition(_position.lock()->getPosition());
@@ -34,7 +40,6 @@ public:
 	std::weak_ptr<GraphPoint> getPosition() const {
 		return _position;
 	};
-
 	std::uint64_t getID() const {
 		return __object_id;
 	};

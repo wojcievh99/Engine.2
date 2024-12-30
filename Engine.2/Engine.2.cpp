@@ -10,22 +10,6 @@ import Rectangle;
 import Character;
 
 
-/*
-* Zmienić className na type_index(type_info) [+-] (deleted unused and unnecessary classname)
-* Globals const [+]
-
-Wzorce Projektowe na kiedyś
-
-Przed code review: 
-Wielowątkowość [+]
-Wydajność forów
-Optymalizacja Delete (stos, kolejka zamiast zmiennej 'alive') [+]
-Optymalizacja Drawable (z class Transformable) [+-]
-
-Code review:
-przemyślana Obsługa Wyjątków
-
-*/
 int main()
 {
 
@@ -43,4 +27,5 @@ int main()
         
     Engine::get().run();
     return 0;
+
 }

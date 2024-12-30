@@ -5,14 +5,6 @@ import Base;
 
 import GraphContainer;
 
-export enum direction {
-	NONE = 0,
-	UP = 1,
-	DOWN = 2,
-	LEFT = 3,
-	RIGHT = 4
-};
-
 export 
 sf::Vector2i operator-(sf::Vector2i v, unsigned int i) {
 	if (v.x > 0) v.x--;
@@ -37,10 +29,8 @@ public:
 	void setAccDirectionX(int X) { __acceleration.x = X; }
 	void setAccDirectionY(int Y) { __acceleration.y = Y; }
 
-	virtual void moveObject() {
+	void moveObject() {
 		GraphContainer::get().getPoint(_position.lock()->getNumber() + this->getMoveDir(), _position);
-		std::cout << getMoveDir().x << " " << getMoveDir().y << std::endl;
-		std::cout << "Moved to: " << _position.lock()->getNumber().x << " " << _position.lock()->getNumber().y << std::endl << std::endl;
 	};
 	void moveOnce(sf::Vector2i _dir) {
 		GraphContainer::get().getPoint(_position.lock()->getNumber() + _dir, _position);

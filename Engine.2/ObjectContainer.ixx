@@ -3,14 +3,18 @@ export module ObjectContainer;
 import Globals;
 import ObjectHolder;
 
-import Base;
+import Exceptions;
 
+import Base;
 import Drawable;
 import Updateable;
 import Moveable;
 import Collidable;
 import Eventable;
 
+// Container for all objects in the engine
+// 
+// Singleton: only one instance of this class is allowed.
 export class ObjectContainer {
 
 	ObjectContainer() = default;
@@ -35,7 +39,13 @@ public:
 
 	// for when there is no other option that to use fundamental database
 	std::shared_ptr<Base>& getObjectByID(uint64_t _id) {
-		return _database[_id];
+		try {
+			if (_database.find(_id) == _database.end()) throw accesing_nonexistend_object();
+			return _database[_id];
+		}
+		catch (const std::exception& err) {
+			std::cerr << "Error: " << red << err.what() << reset << std::endl;
+		}
 	}
 	std::list<uint64_t>& getBin() {
 		return _bin;
@@ -69,15 +79,22 @@ public:
 
 	void remove(uint64_t _id) {
 
-		// deleting every instance of an object
-		tasks._objectMoves.erase(_id);
-		tasks._objectDraws.erase(_id);
-		tasks._objectUpdates.erase(_id);
-		tasks._objectWithCollisions.erase(_id);
-		tasks._objectsWithEventsAssociatedWithFunctions.erase(_id);
+		try {
+			if (_database.find(_id) == _database.end()) throw removing_nonexistend_object();
+
+			// deleting every instance of an object
+			tasks._objectMoves.erase(_id);
+			tasks._objectDraws.erase(_id);
+			tasks._objectUpdates.erase(_id);
+			tasks._objectWithCollisions.erase(_id);
+			tasks._objectsWithEventsAssociatedWithFunctions.erase(_id);
 
 
-		_database.erase(_id);
+			_database.erase(_id);
+		}
+		catch (const std::exception& err) {
+			std::cerr << "Error: " << red << err.what() << reset << std::endl;
+		}
 
 	}
 

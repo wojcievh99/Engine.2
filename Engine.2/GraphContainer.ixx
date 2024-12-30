@@ -16,6 +16,11 @@ sf::Vector2u operator + (sf::Vector2u a, sf::Vector2i b)
 };
 
 // Container class for graph points
+// 
+// Graph points through the implementation of this class 
+// can be dynamically created, loaded and accessed.
+//
+// Singleton: only one instance of this class is allowed.
 export class GraphContainer {
 
 	std::unordered_map<sf::Vector2u, std::shared_ptr<GraphPoint>, v2u_hash> __container;
