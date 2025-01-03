@@ -16,3 +16,11 @@ concept Positionable = requires (P p) {
 	{ p.setPosition };
 	{ p.getPosition };
 };
+
+export template <typename P>
+concept Pointer = std::is_pointer_v<P>;
+
+export template <typename D>
+concept DrawableDerived = requires (D d) {
+	{ d->draw };
+};

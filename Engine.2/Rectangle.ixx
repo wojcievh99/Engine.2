@@ -9,15 +9,15 @@ import Collidable;
 import Deleteable;
 
 export class Rectangle : public virtual Base, public Eventable, public Deleteable, public Drawable, public Collidable {
-	sf::RectangleShape _body;
 
 public:
 	Rectangle(sf::Vector2u position, sf::Vector2u size, sf::Color color)
 		: Base(position), Collidable(size)
 	{
-		correctPosition(_body);
-		_setSize(_body, size);
-		_body.setFillColor(color); 
+
+		setObject(object_type::RECTANGLE);
+		_setSize(size);
+		_object.get<sf::RectangleShape>()->setFillColor(color);
 
 		addKeyAssociation(sf::Keyboard::T, Functor(
 			[this]() {
@@ -25,11 +25,6 @@ public:
 			}
 		));
 
-	}
-
-	void drawObject() {
-		correctPosition(_body);
-		window->draw(_body);
 	}
 
 };

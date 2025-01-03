@@ -40,7 +40,7 @@ public:
 		__moveDirection += __acceleration;
 	}
 
-	sf::Vector2i getMoveDir() { return __moveDirection; }
-	sf::Vector2i getAccDir() { return __acceleration; }
+	sf::Vector2i getMoveDir() const { return __moveDirection; }
+	sf::Vector2i getAccDir() const { return __acceleration; }
 
 };

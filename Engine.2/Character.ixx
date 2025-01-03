@@ -9,15 +9,14 @@ import Collidable;
 import Deleteable;
 
 export class Character : public virtual Base, public Deleteable, public Drawable, public Moveable, public Eventable, public Collidable {
-	sf::RectangleShape _body;
 
 public:
 	Character(sf::Vector2u position, sf::Vector2u size, sf::Color color)
 		: Base(position), Collidable(size)
 	{
-		correctPosition(_body);
-		_setSize(_body, size);
-		_body.setFillColor(color);
+		setObject(object_type::RECTANGLE);
+		_setSize(size);
+		_object.get<sf::RectangleShape>()->setFillColor(color);
 
 		this->setAccDirection(sf::Vector2i(0, 1));
 
@@ -37,11 +36,6 @@ public:
 			}
 		));
 		
-	}
-
-	void drawObject() override {
-		correctPosition(_body);
-		window->draw(_body);
 	}
 
 };
