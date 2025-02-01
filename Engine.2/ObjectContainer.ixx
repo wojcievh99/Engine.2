@@ -11,6 +11,8 @@ import Updateable;
 import Moveable;
 import Collidable;
 import Eventable;
+import Textureable;
+import Animatable;
 
 // Container for all objects in the engine
 // 
@@ -66,6 +68,9 @@ public:
 		if (std::shared_ptr<Updateable> x = std::dynamic_pointer_cast<Updateable>(r))
 			tasks._objectUpdates[r->getID()] = Functor([x]() { x->updateObject(); });
 
+		if (std::shared_ptr<Animatable> x = std::dynamic_pointer_cast<Animatable>(r))
+			tasks._objectAnimations[r->getID()] = Functor([x]() { x->animateObject(); });
+
 		if (std::shared_ptr<Moveable> x = std::dynamic_pointer_cast<Moveable>(r))
 			tasks._objectMoves.insert(r->getID());
 
@@ -85,10 +90,10 @@ public:
 			// deleting every instance of an object
 			tasks._objectMoves.erase(_id);
 			tasks._objectDraws.erase(_id);
+			tasks._objectAnimations.erase(_id);
 			tasks._objectUpdates.erase(_id);
 			tasks._objectWithCollisions.erase(_id);
 			tasks._objectsWithEventsAssociatedWithFunctions.erase(_id);
-
 
 			_database.erase(_id);
 		}

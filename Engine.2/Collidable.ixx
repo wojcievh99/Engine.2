@@ -23,14 +23,18 @@ public:
 	// default shape is rectangle with given size.
 	// Future development can add an option to add a txt file with any 
 	// defined inside shape that will be taken instead of rectangle
-	Collidable(sf::Vector2u size, unsigned int definedBound = 1);
+	Collidable(sf::Vector2i size, unsigned int definedBound = 1);
+	Collidable(unsigned int definedBound = 1);
 	~Collidable();
 
 	virtual void afterCollision() { };
 	// with object move (defined in class Moveable) comes move bound as well
-	void moveBound(sf::Vector2i move);
+	void moveBound(sf::Vector2i);
+
+	// redefine bound if object size changes
+	void redefineBound(sf::Vector2i);
 
 	// checks if next move will cause an intersection with other object
 	// this intersection-collision is defined in class GraphPoint in function tryBound()
-	bool checkNextMove(sf::Vector2i nextMove);
+	bool checkNextMove(sf::Vector2i);
 };

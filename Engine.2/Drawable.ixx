@@ -23,7 +23,7 @@ public:
 		} catch (const std::bad_variant_access& e) {} //ignore
 
 		try {
-			correctPosition(_object.get<sf::Sprite>());
+			correctPosition_sprite(_object.get<sf::Sprite>());
 			window->draw(*_object.get<sf::Sprite>());
 			return;
 		} catch (const std::bad_variant_access& e) {} //ignore

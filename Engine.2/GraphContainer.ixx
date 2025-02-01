@@ -23,16 +23,16 @@ sf::Vector2u operator + (sf::Vector2u a, sf::Vector2i b)
 // Singleton: only one instance of this class is allowed.
 export class GraphContainer {
 
-	std::unordered_map<sf::Vector2u, std::shared_ptr<GraphPoint>, v2u_hash> __container;
+	std::unordered_map<sf::Vector2i, std::shared_ptr<GraphPoint>, v2i_hash> __container;
 	std::unique_ptr<float> __graphPointDistance;
 
-	void _createPoint(sf::Vector2u number) {		
+	void _createPoint(sf::Vector2i number) {		
 		addPoint(
 			std::make_shared<GraphPoint>(
 				sf::Vector2f(
 					(float)number.x * *__graphPointDistance, (float)number.y * *__graphPointDistance
 				),
-				sf::Vector2u(number.x, number.y))
+				sf::Vector2i(number.x, number.y))
 		);
 	}
 
@@ -74,7 +74,7 @@ public:
 	// to stand on it or it is already defined so there
 	// will not be a single point that exists but was
 	// never used at least once.
-	void getPoint(sf::Vector2u number, std::weak_ptr<GraphPoint>& point) {
+	void getPoint(sf::Vector2i number, std::weak_ptr<GraphPoint>& point) {
 		if (__container.count(number)) { // always 1 or 0
 			point = __container[number]; return;
 		}
@@ -85,7 +85,7 @@ public:
 
 	// exacly the same but returns weak_ptr to that point
 	// instead of changing reference given as a second argument 
-	std::weak_ptr<GraphPoint> getPoint(sf::Vector2u number) {
+	std::weak_ptr<GraphPoint> getPoint(sf::Vector2i number) {
 		if (__container.count(number))
 			return __container[number];
 		else 

@@ -5,12 +5,12 @@ import Globals;
 // one single point of a graph
 export class GraphPoint {
 	// dedicated number and real position
-	sf::Vector2u __nr; sf::Vector2f __position;
+	sf::Vector2i __nr; sf::Vector2f __position;
 	// objects that stand on it currently
 	std::unordered_set<std::pair<uint64_t, unsigned int>, pID_hash> __objects; // <ID, definedBound>
 
 public:
-	GraphPoint(sf::Vector2f position, sf::Vector2u nr)
+	GraphPoint(sf::Vector2f position, sf::Vector2i nr)
 		: __position(position), __nr(nr) { }
 
 	// check if other objects that given one exist on stand point
@@ -32,7 +32,7 @@ public:
 	sf::Vector2f getPosition() {
 		return __position;
 	}
-	sf::Vector2u getNumber() {
+	sf::Vector2i getNumber() {
 		return __nr;
 	}
 

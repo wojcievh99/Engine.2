@@ -8,6 +8,7 @@ export class ObjectHolder {
 
 	std::unordered_map<uint64_t, Functor>	_objectDraws;
 	std::unordered_map<uint64_t, Functor>	_objectUpdates;
+	std::unordered_map<uint64_t, Functor>	_objectAnimations;
 	std::unordered_set<uint64_t>			_objectMoves;
 	std::unordered_set<uint64_t>			_objectWithCollisions;
 	std::unordered_set<uint64_t>			_objectsWithEventsAssociatedWithFunctions;
@@ -20,6 +21,9 @@ public:
 	}
 	const std::unordered_map<uint64_t, Functor>&	updates() {
 		return _objectUpdates;
+	}
+	const std::unordered_map<uint64_t, Functor>&	animations() {
+		return _objectAnimations;
 	}
 	const std::unordered_set<uint64_t>&				moves() {
 		return _objectMoves;

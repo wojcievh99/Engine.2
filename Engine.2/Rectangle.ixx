@@ -11,7 +11,7 @@ import Deleteable;
 export class Rectangle : public virtual Base, public Eventable, public Deleteable, public Drawable, public Collidable {
 
 public:
-	Rectangle(sf::Vector2u position, sf::Vector2u size, sf::Color color)
+	Rectangle(sf::Vector2i position, sf::Vector2i size, sf::Color color)
 		: Base(position), Collidable(size)
 	{
 

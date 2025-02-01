@@ -4,6 +4,7 @@ import Globals;
 import GraphContainer;
 
 import Concepts;
+import Exceptions;
 
 export enum class object_type { RECTANGLE, CIRCLE, SPRITE, NONE };
 
@@ -42,8 +43,6 @@ public:
 		return union_type;
 	}
 
-
-
 	friend class Base;
 };
 
@@ -56,14 +55,16 @@ protected:
 	std::weak_ptr<GraphPoint> _position;
 
 public:
-	Base(sf::Vector2u _pos = sf::Vector2u(0, 0)) {
+	Base(sf::Vector2i _pos = sf::Vector2i(0, 0)) {
 		GraphContainer::get().getPoint(_pos, _position);
 		this->__object_id = ++globalID;
 	}
 	virtual ~Base() = default;
 
-	bool setObject(const object_type&& _type) {
-		if (_object.getType() != object_type::NONE or _type == object_type::NONE) return false;
+	void setObject(const object_type&& _type) {
+		if (_object.getType() != object_type::NONE or _type == object_type::NONE) 
+			throw invalid_union_object();
+
 		_object.allocate(_type);
 		
 		if (_type == object_type::RECTANGLE)
@@ -73,12 +74,11 @@ public:
 		else if (_type == object_type::SPRITE)
 			correctPosition<sf::Sprite>(_object.get<sf::Sprite>());
 
-		return true;
 	}
 
 	// Use when specifing size
 	// Choose the correct function for user's case
-	void _setSize(sf::Vector2u _size) {
+	void _setSize(sf::Vector2i _size) {
 		auto graph_point_distance = GraphContainer::get().getGraphPointDistance();
 
 		if (_object.getType() == object_type::RECTANGLE)
@@ -97,9 +97,13 @@ public:
 
 	// Use when position of body in user's object 
 	// might differ from the true position
-	template <Positionable T>
+	template <Positionable T> // +
 	void correctPosition(std::shared_ptr<T>& body) {
 		body->setPosition(_position.lock()->getPosition());
+	}
+
+	void correctPosition_sprite(std::shared_ptr<sf::Sprite>& body) {
+		body->setPosition(_position.lock()->getPosition() + body->getGlobalBounds().getSize() / 2.f );
 	}
 
 	std::weak_ptr<GraphPoint> getPosition() const {
@@ -110,5 +114,12 @@ public:
 	};
 	virtual std::type_index getType() {
 		return typeid(*this);
+	}
+
+	sf::Vector2i find_point_size(sf::Vector2f _realSize) {
+		return sf::Vector2i(
+			ceil(_realSize.x / GraphContainer::get().getGraphPointDistance()),
+			ceil(_realSize.y / GraphContainer::get().getGraphPointDistance())
+		);
 	}
 };

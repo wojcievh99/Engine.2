@@ -16,6 +16,7 @@ bool __wop;
 sf::Mutex _deleteMutexOne;
 sf::Mutex _deleteMutexTwo;
 sf::Mutex _deleteMutexThree;
+sf::Mutex _deleteMutexFour;
 
 // Only one instance of Engine is allowed
 Engine& Engine::get() {
@@ -146,11 +147,20 @@ void Engine::updateAllObjects() {
 	}
 	_deleteMutexThree.unlock();
 }
+void Engine::animateAllObjects() {
+	_deleteMutexFour.lock();
+	for (auto const& e : ObjectContainer::get().tasks.animations()) {
+		Functor f = e.second; f();
+	}
+	_deleteMutexFour.unlock();
+}
+
 void Engine::deleteAllObjects() {
 	if (ObjectContainer::get().getBin().size()) {
 		_deleteMutexOne.lock();
 		_deleteMutexTwo.lock();
 		_deleteMutexThree.lock();
+		_deleteMutexFour.lock();
 		
 		uint64_t _id = ObjectContainer::get().getBin().front();
 		ObjectContainer::get().remove(_id);
@@ -159,6 +169,7 @@ void Engine::deleteAllObjects() {
 		_deleteMutexOne.unlock();
 		_deleteMutexTwo.unlock();
 		_deleteMutexThree.unlock();
+		_deleteMutexFour.unlock();
 	}
 }
 
@@ -193,10 +204,12 @@ void Engine::run() {
 
 		sf::Thread moveThread(runThread, &Engine::moveAllObjectsAndCheckCollisions);
 		sf::Thread updateThread(runThread, &Engine::updateAllObjects);
+		sf::Thread animateThread(runThread, &Engine::animateAllObjects);
 		sf::Thread deleteThread(runThread, &Engine::deleteAllObjects);
 
 		moveThread.launch();
 		updateThread.launch();
+		animateThread.launch();
 		deleteThread.launch();
 
 		while (__wop) {
@@ -219,6 +232,7 @@ void Engine::run() {
 
 		moveThread.wait();
 		updateThread.wait();
+		animateThread.wait();
 		deleteThread.wait();
 
 	}

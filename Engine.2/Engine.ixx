@@ -18,6 +18,7 @@ export class Engine {
 	static void moveAllObjectsAndCheckCollisions();
 	static void drawAllObjects();
 	static void updateAllObjects();
+	static void animateAllObjects();
 	static void deleteAllObjects();
 	
 	Engine() = default;
