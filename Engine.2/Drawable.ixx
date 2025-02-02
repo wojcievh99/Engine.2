@@ -11,20 +11,20 @@ public:
 	virtual void drawObject() {
 		// correctpos
 		try {
-			correctPosition(_object.get<sf::RectangleShape>());
-			window->draw(*_object.get<sf::RectangleShape>());
+			correctPosition(this->getObject<sf::RectangleShape>());
+			window->draw(*this->getObject<sf::RectangleShape>());
 			return;
 		} catch (const std::bad_variant_access& e) {} //ignore
 
 		try {
-			correctPosition(_object.get<sf::CircleShape>());
-			window->draw(*_object.get<sf::CircleShape>());
+			correctPosition(this->getObject<sf::CircleShape>());
+			window->draw(*this->getObject<sf::CircleShape>());
 			return;
 		} catch (const std::bad_variant_access& e) {} //ignore
 
 		try {
-			correctPosition_sprite(_object.get<sf::Sprite>());
-			window->draw(*_object.get<sf::Sprite>());
+			correctPosition_sprite(this->getObject<sf::Sprite>());
+			window->draw(*this->getObject<sf::Sprite>());
 			return;
 		} catch (const std::bad_variant_access& e) {} //ignore
 

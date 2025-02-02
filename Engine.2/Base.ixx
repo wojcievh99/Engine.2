@@ -50,8 +50,9 @@ public:
 // All basics traits are here
 export class Base {
 	std::uint64_t __object_id;
+	DefinedObjectUnion __object;
+
 protected:
-	DefinedObjectUnion _object;
 	std::weak_ptr<GraphPoint> _position;
 
 public:
@@ -62,36 +63,42 @@ public:
 	virtual ~Base() = default;
 
 	void setObject(const object_type&& _type) {
-		if (_object.getType() != object_type::NONE or _type == object_type::NONE) 
+		if (__object.getType() != object_type::NONE or _type == object_type::NONE) 
 			throw invalid_union_object();
 
-		_object.allocate(_type);
+		__object.allocate(_type);
 		
 		if (_type == object_type::RECTANGLE)
-			correctPosition<sf::RectangleShape>(_object.get<sf::RectangleShape>());
+			correctPosition<sf::RectangleShape>(__object.get<sf::RectangleShape>());
 		else if (_type == object_type::CIRCLE)
-			correctPosition<sf::CircleShape>(_object.get<sf::CircleShape>());
+			correctPosition<sf::CircleShape>(__object.get<sf::CircleShape>());
 		else if (_type == object_type::SPRITE)
-			correctPosition<sf::Sprite>(_object.get<sf::Sprite>());
+			correctPosition<sf::Sprite>(__object.get<sf::Sprite>());
 
+	}
+	template <typename T>
+	std::shared_ptr<T>& getObject() {
+		return __object.get<T>();
 	}
 
 	// Use when specifing size
 	// Choose the correct function for user's case
-	void _setSize(sf::Vector2i _size) {
+	void setSize(sf::Vector2i _size) {
 		auto graph_point_distance = GraphContainer::get().getGraphPointDistance();
 
-		if (_object.getType() == object_type::RECTANGLE)
-			_object.get<sf::RectangleShape>()->setSize(
+		if (__object.getType() == object_type::RECTANGLE)
+			__object.get<sf::RectangleShape>()->setSize(
 				sf::Vector2f(_size.x * graph_point_distance, _size.y * graph_point_distance)
 			);
+		else throw std::bad_variant_access();
 
 	}
-	void _setRadius(float r) {
+	void setRadius(float r) {
 		auto graph_point_distance = GraphContainer::get().getGraphPointDistance();
 
-		if (_object.getType() == object_type::CIRCLE)
-			_object.get<sf::CircleShape>()->setRadius(r * graph_point_distance);
+		if (__object.getType() == object_type::CIRCLE)
+			__object.get<sf::CircleShape>()->setRadius(r * graph_point_distance);
+		else throw std::bad_variant_access();
 
 	}
 

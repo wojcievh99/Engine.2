@@ -175,13 +175,14 @@ void Engine::deleteAllObjects() {
 
 void Engine::init(
 	std::pair<unsigned int, unsigned int> _windowSize, std::string _windowName,
-	bool _resizable, unsigned int _framerate, unsigned int _pd)
+	bool _fullscreen, bool _resizable, unsigned int _framerate, unsigned int _pd)
 {
 
 	window = std::make_unique<sf::RenderWindow>
 		(
-			sf::VideoMode(_windowSize.first, _windowSize.second),
-			_windowName, _resizable ? (sf::Style::Default) : (sf::Style::Close)
+			sf::VideoMode(_windowSize.first, _windowSize.second), _windowName, 
+			_fullscreen ? (sf::Style::Fullscreen) 
+			: (_resizable ? (sf::Style::Default) : (sf::Style::Close))
 		);
 
 	__framerate = _framerate;

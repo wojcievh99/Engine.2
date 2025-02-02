@@ -54,7 +54,8 @@ public:
 
 	void init(
 		std::pair<unsigned int, unsigned int> _windowSize, std::string _windowName,
-		bool _resizable = false, unsigned int _framerate = 60, unsigned int _pd = 2);
+		bool _fullscreen = false, bool _resizable = false, unsigned int _framerate = 60,
+		unsigned int _pd = 2);
 
 	void run();
 

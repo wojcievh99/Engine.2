@@ -10,7 +10,7 @@ Collidable::Collidable(unsigned int definedBound)
 		__objectBounds.addRectangleBound(
 			_position.lock()->getNumber(), 
 			_position.lock()->getNumber() 
-				+ this->find_point_size(_object.get<sf::Sprite>()->getGlobalBounds().getSize())
+				+ this->find_point_size(getObject<sf::Sprite>()->getGlobalBounds().getSize())
 			);
 
 	}

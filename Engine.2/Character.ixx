@@ -12,7 +12,7 @@ import Textureable;
 import Animatable;
 
 export class Character : public virtual Base, 
-	public virtual Textureable, public Animatable, 
+	public virtual Textureable, public Animatable,
 	public Drawable, public Moveable, 
 	public Eventable, public Collidable 
 {
@@ -20,7 +20,7 @@ export class Character : public virtual Base,
 public:
 	Character(sf::Vector2i position, sf::Vector2i size, sf::Color color)
 		: Base(position), 
-		Textureable("assets", sf::Vector2f(2.f, 2.f), "Samurai.png"),
+		Textureable("assets/MartialHero", sf::Vector2f(2.f, 2.f)),
 		Animatable("directives_anim/character_anim_directive.txt"),
 		Collidable()
 	{

@@ -16,8 +16,8 @@ public:
 	{
 
 		setObject(object_type::RECTANGLE);
-		_setSize(size);
-		_object.get<sf::RectangleShape>()->setFillColor(color);
+		this->setSize(size);
+		getObject<sf::RectangleShape>()->setFillColor(color);
 
 		addKeyAssociation(sf::Keyboard::T, Functor(
 			[this]() {

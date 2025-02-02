@@ -8,3 +8,4 @@ export import Updateable;
 export import Collidable;
 export import Deleteable;
 export import Textureable;
+export import Animatable;

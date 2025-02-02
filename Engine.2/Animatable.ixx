@@ -33,9 +33,9 @@ struct forward_frame {
 	}
 
 	void increment_texture_index() {
-		if (_texture_index != _animation_files.end() - 1)
-			_texture_index++;
-		else _texture_index = _animation_files.begin();
+		if (_texture_index + 1 == _animation_files.end())
+			_texture_index = _animation_files.begin();
+		else _texture_index++;
 	}
 
 };
@@ -69,6 +69,11 @@ public:
 		while (!_file_ad.eof()) {
 			std::getline(_file_ad, file_line);
 			
+			if (file_line == "") continue; 
+			// often mistake done by the user: empty line in the directive file
+			// it's not a good practise but also not a problem, so for the ease of use 
+			// I will let the user add an extra line and not cause any problem
+
 			if (std::regex_match(file_line, pattern))
 				std::regex_search(file_line, matches, pattern);
 			else
@@ -85,7 +90,7 @@ public:
 
 		_animation_index = _animation_data.begin();
 		_animation_index->second._texture_index = _animation_index->second._animation_files.begin();
-		// wierd but it works, thought I could do that in constructor but it didn't work
+		// weird but it works, thought I could do that in constructor but it didn't work
 
 		this->change_file(*_animation_index->second._texture_index);
 
@@ -105,7 +110,7 @@ public:
 		if (elapsedTime - _anim_last_change > _animation_index->second._time_in_miliseconds) {
 			_anim_last_change = elapsedTime;
 
-			_animation_index->second.increment_texture_index(); // safer than ++_texture_index
+			_animation_index->second.increment_texture_index(); // safer than ++_texture_index			
 			this->change_file(*_animation_index->second._texture_index);
 			
 		}

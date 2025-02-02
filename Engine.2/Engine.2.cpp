@@ -5,49 +5,51 @@ import std;
 import Engine;
 
 import Globals;
+import Depen;
 
-import Rectangle;
-import Character;
+class Ground 
+    : public virtual Base, public Drawable, public Collidable 
+{
 
-/*
-"player.png" player.txt
-DEFAULT { [30,50,20,100,timeMS],   [], [], [] } [0]
+public:
+    Ground(sf::Vector2i _position, sf::Vector2i _size) 
+        : Base(_position), Collidable(_size)
+    {
 
-"(.+?) \{\([([0-9]+?),([0-9]+?),...\][ ].)+ "
+		this->setObject(object_type::RECTANGLE);
+		this->setSize(_size);
+        this->getObject<sf::RectangleShape>()->setFillColor(sf::Color::Red);
 
-DEAD { [], []. }
-GOLEFT { ... }
-GOLRIGHT
-GOUP
-GODOWN
-JUMPLEFT
-JUMPRIGHT
-BORING { }
+    };
+};
 
-&DOITACTUAL =
-actual_index =0
-+ Wewnętrzny zegar animacji (*)
+class Hero
+	:	public virtual Base, public virtual Textureable, public Animatable,
+		public Drawable, public Collidable, public Moveable
+{
+public:
+	Hero(sf::Vector2i _position, sf::Vector2i _size, sf::Color _color)
+		: Base(_position),  
+		Textureable("assets/MartialHero", sf::Vector2f(2.f, 2.f)),
+		Animatable("directives_anim/character_anim_directive.txt"),
+		Collidable()
+	{
+		this->setAccDirection(sf::Vector2i(0, 1));
 
-Event Left Arrow:
-changeAnim("GOLEFT")
-================================
-HEAD
-LEFT ARM
-RIGHT ARM*/
+	};
+};
+
 
 int main()
 {
 
-    Engine::get().init(std::make_pair(1000, 1200), "TEST", false, 60, 3);
+    Engine::get().init(std::make_pair(1000, 1200), "SuperGame", false, false, 60, 2);
     
-	Engine::get().create<Rectangle>(
-        sf::Vector2i(10, 200), sf::Vector2i(100, 10), sf::Color::Red
-    );
-    Engine::get().create<Rectangle>(
-        sf::Vector2i(50, 220), sf::Vector2i(200, 10), sf::Color::Red
-    );
-	Engine::get().create<Character>(
-		sf::Vector2i(100, 100), sf::Vector2i(10, 15), sf::Color::Green
+	Engine::get().create<Ground>(
+		sf::Vector2i(50, 200), sf::Vector2i(100, 20)
+	);
+	Engine::get().create<Hero>(
+		sf::Vector2i(80, 10), sf::Vector2i(10, 15), sf::Color::Green
 	);
 
     Engine::get().run();
